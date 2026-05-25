@@ -1,0 +1,90 @@
+# Outreach recipients — DATA-DRIVEN, not hardcoded. Swap in real Coresignal /
+# LinkedIn / public data by editing this file; the generator never changes.
+#
+# 5 recipients spanning industries, seniority, and hiring patterns.
+# >=2 are deliberately SPARSE (r4, r5) to test low-information handling: the
+# enricher derives the richness tier from field presence, not a manual label.
+#
+# These samples are anonymised/representative; replace with your sourced data.
+
+recipients:
+  # --- RICH ---------------------------------------------------------------- #
+  - id: r1
+    name: "Adeline Soh"
+    title: "Chief Operating Officer"
+    company: "Keppel Straits Capital"
+    company_type: "boutique Singapore asset manager (~35 staff), CMS-licensed"
+    location: "Singapore"
+    linkedin_url: "https://linkedin.com/in/example-adeline-soh"
+    headline: "COO at Keppel Straits Capital | scaling an independent SG asset manager"
+    about: >
+      Building out the institutional infrastructure of an independent asset manager
+      post a strategic investment. Previously COO at a multi-family office. Focused
+      on operations, governance, and regulatory readiness as we move upmarket into
+      accredited-investor distribution.
+    experience:
+      - title: "COO"
+        company: "Keppel Straits Capital"
+        dates: "2022–present"
+      - title: "COO"
+        company: "Lumen Family Office"
+        dates: "2017–2022"
+    recent_signals:
+      - "Firm announced a strategic minority investment from a global alternatives manager (trade press, last quarter)."
+      - "Posted about hiring across compliance and operations to support AI distribution."
+    source: "linkedin_manual + public news"
+
+  - id: r2
+    name: "Daniel Reyes"
+    title: "Head of Talent"
+    company: "Anchorpoint Partners"
+    company_type: "Asia-focused mid-market private equity firm"
+    location: "Singapore"
+    linkedin_url: "https://linkedin.com/in/example-daniel-reyes"
+    headline: "Head of Talent, Anchorpoint Partners | building investment teams across SEA"
+    about: >
+      Lead talent for a growing PE platform. Spend most of my time on senior
+      investment and portfolio-operations hires across Southeast Asia. Always
+      interested in better ways to reach passive senior candidates.
+    experience:
+      - title: "Head of Talent"
+        company: "Anchorpoint Partners"
+        dates: "2020–present"
+      - title: "Senior Recruiter, Financial Services"
+        company: "Korn Ferry"
+        dates: "2014–2020"
+    recent_signals:
+      - "Firm closed Fund III recently; portfolio expanding (public announcement)."
+    source: "linkedin_manual"
+
+  # --- MODERATE ------------------------------------------------------------ #
+  - id: r3
+    name: "Priya Nair"
+    title: "Co-Founder & CEO"
+    company: "Lattice Wealth"
+    company_type: "Singapore wealthtech startup"
+    location: "Singapore"
+    linkedin_url: "https://linkedin.com/in/example-priya-nair"
+    headline: "Co-Founder & CEO at Lattice Wealth"
+    recent_signals:
+      - "Lattice Wealth raised a Series A (announced)."
+    source: "public"
+    notes: "Headline + one funding signal; no about-section. Moderate richness."
+
+  # --- SPARSE (low-information cases) -------------------------------------- #
+  - id: r4
+    name: "T. K. Lim"
+    headline: "Private Investor"
+    location: "Singapore"
+    source: "public"
+    notes: >
+      Deliberately minimal presence — likely a single-family-office principal.
+      No company, no role detail, no activity. Sparse by design.
+
+  - id: r5
+    name: "Marcus Whitfield"
+    company: "Whitfield & Co"
+    source: "linkedin_manual"
+    notes: >
+      Name + firm only. No title, headline, location, or activity. The hardest
+      case: almost no signal to ground personalisation in.

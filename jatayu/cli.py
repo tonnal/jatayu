@@ -111,5 +111,26 @@ def run_all(
     console.print(f"[bold]{run.ledger.summary()}[/bold]")
 
 
+@app.command("outreach")
+def outreach(
+    aidentifi: str = "configs/aidentifi.yaml",
+    recipients: str = "configs/recipients.yaml",
+    out: str = "data/output/outreach",
+) -> None:
+    """Q2: generate one personalised BD outreach per recipient (data-driven)."""
+    from .outreach.runner import run_all
+
+    drafts = run_all(aidentifi, recipients, out,
+                     api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    table = Table(title="Outreach drafts")
+    for col in ("id", "name", "tier", "channel", "conf", "review", "ungrounded"):
+        table.add_column(col)
+    for d in drafts:
+        table.add_row(d.recipient_id, d.recipient_name or "?", d.tier, d.channel,
+                      d.confidence, str(d.review_required), str(len(d.ungrounded_claims)))
+    console.print(table)
+    console.print(f"drafts -> {out}/")
+
+
 if __name__ == "__main__":
     app()

@@ -1,0 +1,34 @@
+# Working assumption about Aidentifi's positioning, inferred from public presence.
+# The brief says not to research this deeply — this is a defensible working model,
+# editable in one place. Aidentifi = "AI" + "identify": AI-native executive search.
+
+name: "Aidentifi"
+one_liner: >
+  An AI-native executive search firm that finds and ranks hard-to-source senior
+  talent in financial services with precision traditional retained search can't match.
+positioning: >
+  Aidentifi pairs experienced search professionals with proprietary AI sourcing and
+  ranking systems. Where conventional search relies on a recruiter's rolodex and
+  title-matching, Aidentifi maps the true shape of a talent pool, reaches passive
+  candidates who aren't job-hunting, and delivers a tightly-fit shortlist in days,
+  not months — especially for narrow, judgment-heavy senior mandates in asset
+  management, family offices, and regulated financial firms across Asia.
+value_props:
+  - "Reaches passive, hard-to-source senior candidates that keyword search misses."
+  - "Precision shortlists: fit assessed on firm type, license, business model — not titles."
+  - "Speed: weeks of sourcing compressed into days via AI, with human judgment on top."
+  - "Domain depth in Singapore / Asia financial services and regulated growth-stage firms."
+proof_points:
+  - "Proprietary sourcing + ranking engine (firm-attribute filtering, gated fit scoring)."
+  - "Built by a team operating at the intersection of AI engineering and search."
+target_clients: >
+  Founders, principals, COOs, and heads of talent at asset managers, single/multi
+  family offices, private banks, PE/VC firms, and fintechs — anyone with a hard,
+  senior, judgment-heavy hire and little time to fill it.
+sender_name: "the Aidentifi team"
+sender_role: "Partner, Aidentifi"
+voice: >
+  Concise, senior-to-senior, specific. No flattery, no buzzword soup, no "I hope
+  this finds you well". One concrete observation about their situation, one concrete
+  reason Aidentifi is relevant, one low-friction ask. The tone of a busy partner
+  who respects the reader's time.
