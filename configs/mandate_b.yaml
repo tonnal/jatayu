@@ -1,0 +1,212 @@
+# =============================================================================
+# Mandate B — Investment Director, Singapore Single Family Office (SFO)
+# =============================================================================
+# Same schema as Mandate A — ZERO code changes, only config. This file is the
+# living proof of the mandate-agnostic claim and the basis for the Q1b doc.
+#
+# Key judgment differences vs Mandate A:
+#   - The pool is FUZZIER: multiple valid archetypes (ex-SFO/MFO PM, senior
+#     buy-side PM, private banker with a PM book). So the filter is BROADER and
+#     discrimination shifts from the filter into the scorer's weights.
+#   - Firm SIZE is a weak signal here (a senior PM seat exists at firms of any
+#     size), so we do NOT cap employee_count the way Mandate A does.
+#   - SFO professionals keep sparse LinkedIn presence, so sparseness is treated
+#     as a mild positive, not a disqualifier (handled in scoring guidance).
+# =============================================================================
+
+mandate:
+  id: mandate_b
+  name: "Investment Director — Singapore Single Family Office"
+  description: >
+    Established Singapore SFO under the MAS Section 13N scheme; principal is an
+    entrepreneur-investor post operating-business exit. Multi-asset mandate across
+    global public equities, fixed income, REITs, PE, VC, hedge funds, and
+    alternatives. The hire owns portfolio construction and execution across the
+    full spectrum, reporting directly to the principal. Senior, broad-mandate seat.
+    SG Citizen/PR strongly preferred, 15+ years investment experience, multi-asset
+    PM track record across public AND private markets is essential. Prior SFO/MFO
+    experience is a strong positive; alternatively a senior buy-side PM seat with
+    discretionary mandate, or HNW/family-office-facing private banking with a PM
+    book. CFA valued. Long Singapore tenure signals commitment to stay.
+
+# --------------------------------------------------------------------------- #
+# SOURCING — broader than Mandate A. No size cap; multi-asset / buy-side net.
+# --------------------------------------------------------------------------- #
+sourcing:
+  location_countries:
+    - "Singapore"
+  min_years_total_experience: 15
+
+  company_filters:
+    industries_any:
+      - "Investment Management"
+      - "Capital Markets"
+      - "Venture Capital & Private Equity"
+      - "Financial Services"
+      - "Banking"          # private banks carry HNW PM-book candidates here
+    # NOTE: intentionally NO employee_count range. Firm size is not a fit signal
+    # for this mandate — senior PM seats exist at SFOs (tiny) and global AMs (huge).
+
+  title_keywords_any:
+    - "Investment Director"
+    - "Portfolio Manager"
+    - "Chief Investment Officer"
+    - "Head of Investments"
+    - "Managing Director, Investments"
+    - "Investment Principal"
+    - "Multi-Asset"
+
+  skills_any:
+    - "Portfolio Management"
+    - "Asset Allocation"
+    - "Private Equity"
+    - "Multi-Asset"
+    - "Investment Strategy"
+
+  exclusions:
+    title_keywords_none:
+      - "Analyst"          # junior stepping-up risk
+      - "Intern"
+      - "Associate"
+      - "Sales"
+      - "Distribution"
+    company_keywords_none:
+      - "Financial Advisers"
+      - "Insurance"
+    industries_none:
+      - "Insurance"
+
+  dev:
+    sample_size: 12
+    max_credits: 60        # fuzzier pool -> more filter iterations needed
+  production:
+    collect_limit: 220
+    max_credits: 240
+
+# --------------------------------------------------------------------------- #
+# FIRM TAXONOMY — buy-side / family-office centric. Sell-side is the wrong pool.
+# --------------------------------------------------------------------------- #
+firm_taxonomy:
+  types:
+    sell_side_ib:
+      label: "Sell-side / investment banking — no discretionary PM book"
+      tier: disqualified
+      name_keywords_any:
+        - "Securities"
+        - "Brokerage"
+        - "Investment Banking"
+
+    retail_ifa:
+      label: "Retail / IFA — wrong client and no PM mandate"
+      tier: disqualified
+      name_keywords_any:
+        - "Financial Advisers"
+        - "Insurance"
+
+    single_family_office:
+      label: "Single family office — the bullseye"
+      tier: core
+      name_keywords_any:
+        - "Family Office"
+        - "Single Family"
+
+    multi_family_office:
+      label: "Multi-family office / EAM — very strong adjacent"
+      tier: core
+      name_keywords_any:
+        - "Multi Family"
+        - "Multi-Family"
+        - "Family Capital"
+
+    private_bank:
+      label: "Private bank — HNW-facing PM book, deal-flow relationships"
+      tier: adjacent
+      name_anchors:
+        - "UBS"
+        - "Credit Suisse"
+        - "Julius Baer"
+        - "Bank of Singapore"
+        - "LGT"
+        - "Pictet"
+
+    buy_side_am:
+      label: "Buy-side asset manager / hedge fund — discretionary PM track record"
+      tier: adjacent
+      industries_any:
+        - "Investment Management"
+        - "Capital Markets"
+        - "Venture Capital & Private Equity"
+
+# --------------------------------------------------------------------------- #
+# SCORING — weights shift toward track-record breadth and Singapore roots.
+# Gates encode the "weak looks like" patterns: single-asset, junior, pure sell-side.
+# --------------------------------------------------------------------------- #
+scoring:
+  model: "claude-opus-4-7"
+  shortlist_threshold: 40
+
+  gates:
+    - id: minimum_experience_15y
+      description: >
+        At least ~15 years of investment experience. FAILS for junior-to-mid
+        professionals stepping up too far (analyst/associate-level tenure only).
+      hard: true
+    - id: discretionary_pm_track_record
+      description: >
+        Has a genuine discretionary portfolio-management track record (owned
+        allocation/construction decisions). FAILS for pure sell-side, pure
+        advisory, or sales/distribution with no PM book.
+      hard: true
+    - id: multi_asset
+      description: >
+        Multi-asset breadth across public AND private markets. FAILS for
+        single-asset-class specialists (e.g. equities-only or fixed-income-only).
+      hard: true
+    - id: singapore_rooted
+      description: >
+        Singapore Citizen/PR or clear long Singapore tenure. Soft-fails (flag,
+        don't hard-zero) for transient SG candidates with weak local roots.
+      hard: false
+
+  sub_scores:
+    # sub_score_1
+    - id: multi_asset_pm_track_record
+      label: "Multi-asset PM track record"
+      weight: 0.30
+      guidance: >
+        Depth and breadth of discretionary multi-asset portfolio management across
+        public (equities, FI, REITs) AND private (PE, VC, hedge funds, alts)
+        markets. Reward a demonstrated discretionary mandate over a broad spectrum;
+        penalise single-asset specialists even at senior titles.
+    # sub_score_2
+    - id: sfo_mfo_fit
+      label: "SFO/MFO / principal-facing fit"
+      weight: 0.25
+      guidance: >
+        Prior SFO/MFO experience, or a senior PM seat reporting to a principal /
+        investment committee with discretionary latitude. A sparse LinkedIn profile
+        at a credible family-office-shaped firm is a MILD POSITIVE here (senior SFO
+        people deliberately keep low profiles) — do not penalise sparseness; lower
+        confidence instead.
+    # sub_score_3
+    - id: private_markets_depth
+      label: "Private markets depth & deal flow"
+      weight: 0.20
+      guidance: >
+        PE/VC/alternatives experience and the relationships that generate private
+        deal flow (incl. strong private-bank relationships). Infer from employers
+        and mandate scope.
+    # sub_score_4
+    - id: singapore_roots
+      label: "Singapore roots & commitment"
+      weight: 0.15
+      guidance: >
+        Long Singapore tenure, SG Citizen/PR signals, local network. Indicates
+        commitment to stay — the principal is hiring for the long term.
+    # sub_score_other
+    - id: seniority_scope
+      label: "Seniority & mandate scope"
+      weight: 0.10
+      guidance: >
+        15+ years and genuine senior scope (owned a book / broad mandate), not a
+        mid-level professional stretching up. CFA or equivalent is a positive signal.
