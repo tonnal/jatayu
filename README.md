@@ -70,6 +70,25 @@ Outputs land in `data/output/`: `raw_production_pull.csv`,
 
 Offline sanity check (zero credits, no keys): `python scripts/mock_e2e.py`.
 
+## Web product (FastAPI + Next.js)
+
+A thin SaaS layer over the engine. **Demo mode** (no keys) drives the *real*
+engine over mock data, so the full workflow is clickable locally:
+
+```bash
+chmod +x scripts/dev.sh && ./scripts/dev.sh
+# backend  → http://localhost:8000   (FastAPI)
+# frontend → http://localhost:3000   (Next.js)
+```
+
+Walk the funnel: pick a mandate → **Sourcing console** (filter + generated ES DSL
++ live credit meter) → **Run dev pull** (firm-tier precision) → **production pull**
+→ **gated scoring** → **ranked review** with a candidate drawer where you can
+**override** any sub-score or gate and recompute the fit deterministically. The
+**Outreach** tab shows the Q2 drafts with richness tiers and uncertainty flags.
+
+When `.env` has keys, the same screens flip to LIVE (real Coresignal + LLM).
+
 ## Switching mandates
 
 No code changes — point at a different config:

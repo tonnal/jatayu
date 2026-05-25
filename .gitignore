@@ -17,10 +17,10 @@ web/.next/
 web/out/
 .DS_Store
 
-# engine outputs (keep the directory, ignore generated artifacts by default;
-# the deliverable CSV/XLSX are copied into deliverables/ explicitly)
+# engine outputs — generated artifacts (mock in demo, real after live run).
+# The graded deliverables get copied into deliverables/ explicitly for submission.
 data/cache/
-data/output/*.json
+data/output/
 
 # but DO track the graded deliverables
 !deliverables/
