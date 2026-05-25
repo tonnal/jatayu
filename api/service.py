@@ -36,7 +36,8 @@ def _cfg(mid: str) -> MandateConfig:
 
 def _state(mid: str) -> dict:
     if mid not in _STORE:
-        _STORE[mid] = {"ledger": CreditLedger(hard_cap=300), "pairs": {}, "profiles": []}
+        _STORE[mid] = {"ledger": CreditLedger(hard_cap=300), "pairs": {}, "profiles": [],
+                       "triage": {}, "status": {}, "calibration": {}}
     return _STORE[mid]
 
 
@@ -143,6 +144,12 @@ def mandate_detail(mid: str) -> dict:
                         "guidance": s_.guidance.strip()} for s_ in c.scoring.sub_scores],
         "query": build_search_query(s, size=50),
         "live_available": live_available(),
+        # workflow content
+        "spec": c.spec.model_dump(),
+        "criteria_evidence": [ce.model_dump() for ce in c.criteria_evidence],
+        "market_map": c.market_map.model_dump(),
+        "off_limits": c.off_limits,
+        "negative_heuristics": [h.model_dump() for h in c.negative_heuristics],
     }
 
 
@@ -225,18 +232,134 @@ def run_score(mid: str) -> dict:
 def _ranked(mid: str) -> dict:
     cfg = _cfg(mid)
     st = _state(mid)
+    triage, status = st["triage"], st["status"]
     pairs = list(st["pairs"].values())
-    ranked = sorted(pairs, key=lambda pr: (not pr[1].disqualified, pr[1].fit_score),
-                    reverse=True)
-    out = []
-    rank = 0
+    # rejected candidates sink; active (accept/park/none) rank by fit.
+    def key(pr):
+        cid = pr[0].coresignal_id
+        rejected = triage.get(cid) == "reject"
+        return (not rejected, not pr[1].disqualified, pr[1].fit_score)
+    ranked = sorted(pairs, key=key, reverse=True)
+    out, rank = [], 0
     for p, r in ranked:
-        if not r.disqualified:
+        cid = p.coresignal_id
+        active = not r.disqualified and triage.get(cid) != "reject"
+        if active:
             rank += 1
-        out.append({"rank": rank if not r.disqualified else None,
-                    "profile": profile_view(p), "score": score_view(cfg, r)})
+        out.append({"rank": rank if active else None, "profile": profile_view(p),
+                    "score": score_view(cfg, r),
+                    "triage": triage.get(cid, "none"),
+                    "status": status.get(cid, "sourced")})
     return {"candidates": out,
-            "shortlist_size": sum(1 for _, r in pairs if not r.disqualified)}
+            "shortlist_size": sum(1 for p, r in pairs
+                                  if not r.disqualified and triage.get(p.coresignal_id) != "reject")}
+
+
+# --- calibration (S4): score a small benchmark sample, take 👍/👎 ----------- #
+
+
+def calibrate(mid: str, sample: int = 8) -> dict:
+    cfg = _cfg(mid)
+    st = _state(mid)
+    raw = demo_data.profiles_for(mid)[:sample]
+    st["ledger"].record(endpoint="search/es_dsl", query_or_id="<calibration>", credit_cost=1,
+                        profiles_returned=len(raw), stage="dev",
+                        stage_purpose="calibration benchmark", useful_yes_no="yes", notes="demo")
+    benches = []
+    for r in raw:
+        st["ledger"].record(endpoint=f"collect/{r['id']}", query_or_id=r["id"], credit_cost=1,
+                            profiles_returned=1, stage="dev", stage_purpose="calibration collect",
+                            useful_yes_no="yes", notes="demo")
+        p = normalize_profile(r, cfg.firm_taxonomy)
+        sc = mock_score(p, cfg)
+        benches.append({"profile": profile_view(p), "score": score_view(cfg, sc),
+                        "verdict": st["calibration"].get(p.coresignal_id, "none")})
+    return {"benchmarks": benches}
+
+
+def calibrate_feedback(mid: str, verdicts: dict) -> dict:
+    st = _state(mid)
+    st["calibration"].update(verdicts)
+    ups = sum(1 for v in st["calibration"].values() if v == "up")
+    downs = sum(1 for v in st["calibration"].values() if v == "down")
+    return {"applied": True, "thumbs_up": ups, "thumbs_down": downs,
+            "note": f"Targeting confirmed on {ups} benchmarks, {downs} flagged to refine. "
+                    "Filter/weights validated before production spend."}
+
+
+# --- pipeline (P2 triage / P3 shortlist banding + slate) -------------------- #
+
+
+def triage(mid: str, cid: str, verdict: str) -> dict:
+    _state(mid)["triage"][cid] = verdict  # accept | reject | park | none
+    return _ranked(mid)
+
+
+_BANDS = [("Direct fit", 85), ("Strong adjacent", 70), ("Stretch", 50), ("Wildcard", 0)]
+
+
+def shortlist(mid: str, top_n: int = 7) -> dict:
+    cfg = _cfg(mid)
+    st = _state(mid)
+    triage = st["triage"]
+    actives = [(p, r) for p, r in st["pairs"].values()
+               if not r.disqualified and triage.get(p.coresignal_id) != "reject"]
+    actives.sort(key=lambda pr: pr[1].fit_score, reverse=True)
+    chosen = actives[:top_n]
+
+    bands: dict[str, list] = {b[0]: [] for b in _BANDS}
+    for p, r in chosen:
+        band = next(b for b, thresh in _BANDS if r.fit_score >= thresh)
+        bands[band].append({"profile": profile_view(p), "score": score_view(cfg, r),
+                            "status": st["status"].get(p.coresignal_id, "sourced")})
+
+    # balanced-slate diagnostic — honest about what the data source supports.
+    tier_spread: dict[str, int] = {}
+    conf_spread: dict[str, int] = {}
+    for p, r in chosen:
+        t = profile_view(p)["current_firm_tier"]
+        tier_spread[t] = tier_spread.get(t, 0) + 1
+        conf_spread[r.confidence] = conf_spread.get(r.confidence, 0) + 1
+    slate = {
+        "size": len(chosen),
+        "band_counts": {b: len(v) for b, v in bands.items()},
+        "firm_tier_spread": tier_spread,
+        "confidence_spread": conf_spread,
+        "diversity_note": "Gender/background diversity is not inferable from Coresignal "
+                          "data — flag for manual balanced-slate review before client send.",
+    }
+    return {"bands": [{"band": b, "candidates": bands[b]} for b, _ in _BANDS],
+            "slate": slate}
+
+
+def set_status(mid: str, cid: str, status: str) -> dict:
+    _state(mid)["status"][cid] = status
+    return {"ok": True, "cid": cid, "status": status}
+
+
+STATUS_FLOW = ["sourced", "contacted", "responded", "screened", "client_review", "interview", "offer"]
+
+
+def client_report(mid: str) -> dict:
+    cfg = _cfg(mid)
+    st = _state(mid)
+    sl = shortlist(mid)
+    led = st["ledger"]
+    pairs = list(st["pairs"].values())
+    status_counts: dict[str, int] = {}
+    for p, _ in pairs:
+        s = st["status"].get(p.coresignal_id, "sourced")
+        status_counts[s] = status_counts.get(s, 0) + 1
+    return {
+        "mandate": cfg.mandate.name,
+        "generated": "demo",
+        "pool": {"longlist": len(pairs),
+                 "shortlist": sl["slate"]["size"],
+                 "disqualified": sum(1 for _, r in pairs if r.disqualified)},
+        "credits_spent": led.total_spent,
+        "shortlist": sl,
+        "pipeline_status": status_counts,
+    }
 
 
 def apply_override(mid: str, cid: str, sub_overrides: dict, gate_overrides: dict,

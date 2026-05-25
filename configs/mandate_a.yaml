@@ -198,6 +198,77 @@ firm_taxonomy:
 # 0, not an average. The four sub-scores map to the four real fit axes; the
 # fifth ("other") is a tenure/stability signal.
 # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# WORKFLOW CONTENT — drives the human-facing, editable Brief / Market Map /
+# Targeting stages. The engine doesn't depend on these; they're the operator's
+# reasoning made explicit and correctable.
+# --------------------------------------------------------------------------- #
+spec:
+  must_haves:
+    - "MAS CMS-licensed asset-management compliance experience (buy-side, not advisory)"
+    - "Singapore-based"
+    - "8–15 years compliance experience"
+    - "Sole or near-sole ownership of a compliance function"
+  nice_to_haves:
+    - "AI client onboarding under the firm's own license (not retail/IFA)"
+    - "VCC structure familiarity"
+    - "Open-architecture / third-party fund distribution exposure"
+    - "Commercial orientation — partners with the front office"
+
+# The 'signal map': what you want to know -> the observable proxy for it.
+criteria_evidence:
+  - want: "Has run a compliance function solo"
+    proxy: "Firm employee count < 50; senior compliance title at a small firm"
+    signal: high
+  - want: "Understands AI / accredited-investor onboarding"
+    proxy: "Employer serves Accredited Investors via open-architecture wrappers"
+    signal: medium
+  - want: "Knows VCC structures"
+    proxy: "Worked at a firm that has launched VCCs"
+    signal: medium
+  - want: "Long-term Singapore commitment"
+    proxy: "Long SG tenure; SG education; PR/citizenship signals"
+    signal: medium
+  - want: "Commercially oriented (not pure control)"
+    proxy: "Mentions front office, product, new business, fund launches"
+    signal: medium
+  - want: "NOT a bank/Big-4/regulator decoration"
+    proxy: "Employer history dominated by banks, Big-4, MAS, or IFAs"
+    signal: negative
+
+market_map:
+  pool_estimate: "~15–20 genuinely strong, reachable candidates (current & historical)"
+  target_companies:
+    core: ["Independent boutique AMs < 250 staff", "Gordian Capital (shape)", "Tikehau SG (shape)"]
+    adjacent: ["Single/multi family offices", "EAMs", "Large independent asset managers"]
+    stretch: ["Bank-owned AM arms (Eastspring, UBS AM, Schroders)"]
+    excluded: ["Banks (DBS, UBS, StanChart)", "Big-4 advisory", "IFAs (Prudential FA)", "MAS (regulator)"]
+
+# Hard conflict-of-interest exclusions — categorically separate from the
+# 'decoration' heuristics below. These are non-negotiable blocks.
+off_limits:
+  - "The client's own firm and its global parent group"
+  - "Candidates we placed elsewhere in the last 12 months"
+  - "Firms under an active off-limits agreement"
+
+# 'What weak looks like' — decoration archetypes the operator can toggle.
+negative_heuristics:
+  - id: big4_lifer
+    label: "Big-4 advisory lifer — advises, never owned a license"
+    enabled: true
+  - id: bank_head
+    label: "Bank compliance head — ran a slice of a large team, not sole-officer"
+    enabled: true
+  - id: mas_alumnus
+    label: "Regulator with no industry side — knows rules, never implemented them"
+    enabled: true
+  - id: ifa_head
+    label: "Retail/IFA compliance head — wrong client type, wrong license"
+    enabled: true
+  - id: regional_traveler
+    label: "Regional traveler — covers 8 markets, lacks SG regulatory depth"
+    enabled: false
+
 scoring:
   model: "claude-opus-4-7"
   shortlist_threshold: 35   # below this fit_score, not worth surfacing

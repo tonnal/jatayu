@@ -1,17 +1,53 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------ *
+ * Jatayu design tokens — clean enterprise SaaS, light & premium.
+ * Warm-neutral canvas, ink text, a single confident accent (indigo),
+ * serif display headings (Fraunces) over a clean sans (Inter).
+ * ------------------------------------------------------------------ */
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --color-canvas: #f7f6f3;      /* warm off-white page */
+  --color-surface: #ffffff;     /* cards */
+  --color-ink: #1c1b1a;         /* near-black text */
+  --color-muted: #6b6862;       /* secondary text */
+  --color-faint: #9b978f;       /* tertiary text */
+  --color-line: #e7e4dd;        /* hairline borders */
+  --color-accent: #4f46e5;      /* indigo */
+  --color-accent-soft: #eef0fe;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-faint: var(--color-faint);
+  --color-line: var(--color-line);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), ui-serif, Georgia, serif;
 }
 
 body {
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
+
+.font-display {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+}
+
+/* soft, premium card shadow */
+.shadow-card {
+  box-shadow: 0 1px 2px rgba(28, 27, 26, 0.04), 0 4px 16px -8px rgba(28, 27, 26, 0.08);
+}
+.shadow-pop {
+  box-shadow: 0 8px 40px -12px rgba(28, 27, 26, 0.18);
+}
+
+/* thin custom scrollbars in panels */
+.scroll-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+.scroll-thin::-webkit-scrollbar-thumb { background: #d9d6cf; border-radius: 4px; }

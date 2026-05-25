@@ -84,6 +84,54 @@ def reset(mid: str):
     return {"ok": True}
 
 
+# --- setup: calibrate -------------------------------------------------------- #
+
+
+@app.post("/api/mandates/{mid}/calibrate")
+def calibrate(mid: str, sample: int = 8):
+    return {"result": service.calibrate(mid, sample), "credits": service.credit_state(mid)}
+
+
+class FeedbackBody(BaseModel):
+    verdicts: dict[str, str] = {}  # cid -> up|down
+
+
+@app.post("/api/mandates/{mid}/calibrate/feedback")
+def calibrate_feedback(mid: str, body: FeedbackBody):
+    return service.calibrate_feedback(mid, body.verdicts)
+
+
+# --- pipeline: triage / shortlist / status / report ------------------------- #
+
+
+class TriageBody(BaseModel):
+    verdict: str  # accept | reject | park | none
+
+
+@app.post("/api/mandates/{mid}/candidates/{cid}/triage")
+def triage(mid: str, cid: str, body: TriageBody):
+    return service.triage(mid, cid, body.verdict)
+
+
+@app.get("/api/mandates/{mid}/shortlist")
+def shortlist(mid: str, top_n: int = 7):
+    return service.shortlist(mid, top_n)
+
+
+class StatusBody(BaseModel):
+    status: str
+
+
+@app.post("/api/mandates/{mid}/candidates/{cid}/status")
+def set_status(mid: str, cid: str, body: StatusBody):
+    return service.set_status(mid, cid, body.status)
+
+
+@app.get("/api/mandates/{mid}/report")
+def report(mid: str):
+    return service.client_report(mid)
+
+
 # --- Q2 outreach (demo: real enrichment + templated body; live uses LLM) ---- #
 
 

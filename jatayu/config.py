@@ -165,11 +165,54 @@ class MandateMeta(BaseModel):
     description: str
 
 
+# --------------------------------------------------------------------------- #
+# Optional domain content for the operator workflow (Brief / Market Map /
+# Targeting). All optional so existing configs still validate; the engine does
+# not depend on these — they drive the human-facing, editable workflow stages.
+# --------------------------------------------------------------------------- #
+
+
+class Spec(BaseModel):
+    """Structured position spec: the must-haves vs nice-to-haves a searcher signs off."""
+
+    must_haves: list[str] = Field(default_factory=list)
+    nice_to_haves: list[str] = Field(default_factory=list)
+
+
+class CriteriaEvidence(BaseModel):
+    """The 'signal map' — what you want to know vs the observable proxy for it."""
+
+    want: str
+    proxy: str
+    signal: str = "medium"  # high | medium | low | negative
+
+
+class MarketMap(BaseModel):
+    """Target-company landscape, tagged by tier. Anchors are study-only."""
+
+    pool_estimate: str = ""
+    target_companies: dict[str, list[str]] = Field(default_factory=dict)  # tier -> firms
+
+
+class NegativeHeuristic(BaseModel):
+    """A 'what weak looks like' decoration archetype, toggleable by the operator."""
+
+    id: str
+    label: str
+    enabled: bool = True
+
+
 class MandateConfig(BaseModel):
     mandate: MandateMeta
     sourcing: SourcingConfig
     firm_taxonomy: FirmTaxonomy
     scoring: ScoringConfig
+    # optional workflow content
+    spec: Spec = Field(default_factory=Spec)
+    criteria_evidence: list[CriteriaEvidence] = Field(default_factory=list)
+    market_map: MarketMap = Field(default_factory=MarketMap)
+    off_limits: list[str] = Field(default_factory=list)
+    negative_heuristics: list[NegativeHeuristic] = Field(default_factory=list)
 
     @classmethod
     def load(cls, path: str | Path) -> "MandateConfig":
