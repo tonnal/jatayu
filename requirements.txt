@@ -1,0 +1,21 @@
+# --- core engine ---
+pydantic>=2.6
+pyyaml>=6.0
+httpx>=0.27
+tenacity>=8.2           # retry/backoff for API calls
+python-dotenv>=1.0
+
+# --- LLM scoring / outreach ---
+anthropic>=0.39
+
+# --- data + deliverables ---
+pandas>=2.2
+openpyxl>=3.1           # xlsx export
+
+# --- CLI ---
+typer>=0.12
+rich>=13.7
+
+# --- web API ---
+fastapi>=0.110
+uvicorn[standard]>=0.29

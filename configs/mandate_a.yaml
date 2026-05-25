@@ -1,0 +1,278 @@
+# =============================================================================
+# Mandate A — Sole Compliance Officer, Singapore MAS-licensed Asset Manager
+# =============================================================================
+# Domain logic lives here, not in code. The brief warns: title-matching
+# "Compliance + Singapore + Asset Management" returns hundreds of wrong fits;
+# the signal lives in firm scale, license type, AM business model. So the
+# filter leads with firm attributes and treats title as the LAST keyword.
+# =============================================================================
+
+mandate:
+  id: mandate_a
+  name: "Sole Compliance Officer — Singapore Asset Manager"
+  description: >
+    Singapore-headquartered, MAS-licensed asset manager (~SGD 400-700M proprietary
+    AUM plus larger third-party AUM distributed to Accredited Investors via
+    open-architecture wrappers). Recently acquired by a global alternatives
+    manager; rebuilding institutional infrastructure after a retail/IFA heritage.
+    The hire is the SOLE compliance officer: AI client onboarding, MAS regulatory
+    management, fund governance, trade/risk oversight, Board reporting. No team
+    beneath them. Commercially oriented, growth-mode, front-office partner.
+    Singapore-based, 8-15 years compliance experience.
+
+# --------------------------------------------------------------------------- #
+# SOURCING — the filter. Firm attributes first, title last, exclusions explicit.
+# --------------------------------------------------------------------------- #
+sourcing:
+  location_countries:
+    - "Singapore"
+
+  # Soft signal used in scoring/gating; hard to enforce purely at search time.
+  min_years_total_experience: 8
+
+  company_filters:
+    # experience.company_industry — keep broad enough to catch AMs that classify
+    # themselves variously, narrow enough to cut banks/insurers at the source.
+    industries_any:
+      - "Investment Management"
+      - "Financial Services"
+      - "Capital Markets"
+      - "Venture Capital & Private Equity"
+      - "Financial Services Industry"
+    # experience.company_size_employees_count — boutique / independent AM scale.
+    # The bullseye is the SOLE compliance officer, which only exists at small
+    # firms. 5..250 captures genuine boutiques while excluding bank-scale AM arms.
+    employee_count:
+      gte: 5
+      lte: 250
+
+  # Title is the LAST signal. Broad net here; precision comes from the filters
+  # above and the scorer below — not from the title string.
+  title_keywords_any:
+    - "Compliance"
+    - "Chief Compliance Officer"
+    - "Head of Compliance"
+    - "Regulatory"
+    - "Risk and Compliance"
+    - "Legal and Compliance"
+
+  skills_any:
+    - "Regulatory Compliance"
+    - "Financial Services"
+    - "Asset Management"
+    - "AML"
+
+  # The negative space. These cut the dominant decoration archetypes at search
+  # time so we don't pay collect credits on them.
+  exclusions:
+    title_keywords_none:
+      - "Internal Audit"
+      - "Auditor"
+      - "Intern"
+      - "Trainee"
+    company_keywords_none:
+      # Retail / IFA distributors — wrong client type, wrong license.
+      - "Financial Advisers"
+      - "Financial Advisory"
+      - "Wealth Advisory"
+      - "Insurance"
+      - "Assurance"
+    industries_none:
+      - "Banking"
+      - "Insurance"
+      - "Accounting"
+
+  dev:
+    sample_size: 10   # collect a tiny sample to validate the filter
+    max_credits: 50
+  production:
+    collect_limit: 200
+    max_credits: 250
+
+# --------------------------------------------------------------------------- #
+# FIRM TAXONOMY — classify each employer; firm type drives both filter & score.
+# Most-disqualifying / most-specific types first (first match wins).
+# Name anchors are well-known firms used ONLY to calibrate the classifier;
+# we never source candidates from them (per the brief's "study, do not source").
+# --------------------------------------------------------------------------- #
+firm_taxonomy:
+  types:
+    regulator:
+      label: "Regulator (MAS) — rules knowledge, no industry side"
+      tier: disqualified
+      name_anchors:
+        - "Monetary Authority of Singapore"
+      name_keywords_any:
+        - "Monetary Authority"
+
+    big4_advisory:
+      label: "Big 4 advisory compliance — advises, doesn't own"
+      tier: disqualified
+      name_anchors:
+        - "Ernst & Young"
+        - "KPMG"
+        - "Deloitte"
+        - "PwC"
+        - "PricewaterhouseCoopers"
+      name_keywords_any:
+        - "EY"
+        - "Advisory"
+        - "Consulting"
+
+    bank:
+      label: "Bank / capital markets compliance — different rulebook"
+      tier: disqualified
+      name_anchors:
+        - "DBS"
+        - "OCBC"
+        - "UOB"
+        - "Citi"
+        - "Standard Chartered"
+        - "HSBC"
+        - "JPMorgan"
+        - "Goldman Sachs"
+      name_keywords_any:
+        - "Bank"
+
+    ifa_retail:
+      label: "Retail / IFA compliance — wrong client type & license"
+      tier: disqualified
+      name_keywords_any:
+        - "Financial Advisers"
+        - "Financial Advisory"
+        - "Prudential"
+        - "AIA"
+        - "Great Eastern"
+
+    bank_am_arm:
+      label: "Bank-owned asset management arm — large team, not sole-officer"
+      tier: weak
+      name_anchors:
+        - "Eastspring"
+        - "UBS Asset Management"
+        - "Schroders"
+        - "BlackRock"
+        - "Fidelity"
+        - "Amundi"
+      employee_count:
+        gte: 251
+
+    boutique_am:
+      label: "Boutique / independent SG asset manager — the bullseye"
+      tier: core
+      industries_any:
+        - "Investment Management"
+        - "Capital Markets"
+        - "Venture Capital & Private Equity"
+      employee_count:
+        lte: 250
+      # Anchors are SG independent AMs studied for SHAPE only (not sourcing).
+      name_anchors:
+        - "Gordian Capital"
+        - "Tikehau"
+        - "Endowus"
+
+    family_office:
+      label: "Single/multi family office or EAM — adjacent, AI-client exposure"
+      tier: adjacent
+      # Keep keywords specific — generic "Capital/Asset Management" belongs to
+      # boutique_am via attributes, not here.
+      name_keywords_any:
+        - "Family Office"
+        - "Multi Family"
+        - "Single Family"
+      employee_count:
+        lte: 250
+
+    large_am:
+      label: "Large independent asset manager — AM depth, but not sole-officer"
+      tier: adjacent
+      industries_any:
+        - "Investment Management"
+      employee_count:
+        gte: 251
+
+# --------------------------------------------------------------------------- #
+# SCORING — gates (hard disqualifiers) then weighted sub-scores (differentiators).
+# Fit has independent mandatory axes that don't substitute: failing a gate is a
+# 0, not an average. The four sub-scores map to the four real fit axes; the
+# fifth ("other") is a tenure/stability signal.
+# --------------------------------------------------------------------------- #
+scoring:
+  model: "claude-opus-4-7"
+  shortlist_threshold: 35   # below this fit_score, not worth surfacing
+
+  gates:
+    - id: am_side_experience
+      description: >
+        Has genuine buy-side asset-management compliance experience (worked IN a
+        compliance/regulatory role at an asset manager, fund manager, or family
+        office). FAILS if the only experience is Big-4 advisory, pure banking,
+        regulator (MAS) side, audit, or retail/IFA distribution with no AM seat.
+      hard: true
+    - id: singapore_based
+      description: >
+        Currently Singapore-based (most recent role located in Singapore, or
+        clear long Singapore tenure). FAILS if based outside Singapore or only
+        a transient/regional pass through Singapore.
+      hard: true
+    - id: minimum_experience
+      description: >
+        At least ~8 years of compliance / regulatory experience. FAILS if clearly
+        junior (intern, analyst, <6 years total professional compliance).
+      hard: true
+
+  sub_scores:
+    # sub_score_1
+    - id: am_regulatory_fit
+      label: "AM & MAS regulatory fit"
+      weight: 0.30
+      guidance: >
+        How directly does this person's experience map to MAS CMS-licensed asset
+        management compliance? Reward: operational MAS regulatory ownership at a
+        CMS-licensed asset manager; fluency with the Accredited Investor vs Retail
+        distinction; managing the MAS relationship directly. Read employer names
+        and industries, not the job title. Penalise advisory-only, bank-only,
+        regulator-only, or retail/IFA-only exposure even if the title says
+        "Head of Compliance".
+    # sub_score_2
+    - id: ownership_scope
+      label: "Sole / near-sole ownership scope"
+      weight: 0.25
+      guidance: >
+        Has this person OWNED a compliance function alone, end to end? This is
+        rarely stated — INFER it from firm size. A Head/Manager of Compliance at
+        a <50-person asset manager was almost certainly the sole or near-sole
+        compliance officer. A VP Compliance inside a 5,000-person bank ran a slice
+        of a large team — that is the opposite of this role and should score low
+        on this axis even though the seniority looks similar.
+    # sub_score_3
+    - id: business_model_fit
+      label: "AI onboarding / open-architecture / VCC fit"
+      weight: 0.25
+      guidance: >
+        Exposure to the specific business model: Accredited-Investor client
+        onboarding under the firm's own license (not retail/IFA), open-architecture
+        / third-party fund distribution (private credit, PE, hedge funds from
+        global GPs), and VCC structures. Infer from the employer's business model
+        and client type. Someone who spent years at an AI-focused independent AM
+        almost certainly has this even if they never write "VCC".
+    # sub_score_4
+    - id: commercial_orientation
+      label: "Commercial / growth orientation"
+      weight: 0.15
+      guidance: >
+        The firm is in growth mode and the role partners with the front office.
+        Reward language signalling commercial partnership: working with front
+        office, product development, new business, fund launches, building
+        infrastructure. Penalise a purely control/policing posture. This is the
+        differentiator between a good and a great candidate, not a gate.
+    # sub_score_other
+    - id: stability_progression
+      label: "Tenure stability & progression"
+      weight: 0.05
+      guidance: >
+        Long tenure with upward progression at AM firms is a positive (institutional
+        knowledge, real ownership, knows the MAS relationship personally). Frequent
+        short stints (multiple <18-month compliance roles) is a yellow flag to
+        surface in concerns_or_flags, not an automatic penalty.

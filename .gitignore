@@ -1,0 +1,26 @@
+# secrets
+.env
+*.key
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# node / next
+node_modules/
+web/.next/
+web/out/
+.DS_Store
+
+# engine outputs (keep the directory, ignore generated artifacts by default;
+# the deliverable CSV/XLSX are copied into deliverables/ explicitly)
+data/cache/
+data/output/*.json
+
+# but DO track the graded deliverables
+!deliverables/

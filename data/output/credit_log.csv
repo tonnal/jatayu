@@ -1,0 +1,5 @@
+timestamp,endpoint,search_query_or_profile_id,credit_cost,profiles_returned,stage,stage_purpose,useful_yes_no,notes
+2026-05-25T00:43:34+00:00,search,<filter>,1,3,dev,filter validation v1,yes,firm-attribute filter; good tier mix
+2026-05-25T00:43:34+00:00,collect/1001,1001,1,1,production,production collect,yes,
+2026-05-25T00:43:34+00:00,collect/1002,1002,1,1,production,production collect,yes,
+2026-05-25T00:43:34+00:00,collect/1003,1003,1,1,production,production collect,yes,
