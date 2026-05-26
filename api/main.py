@@ -47,6 +47,11 @@ def credits(mid: str):
     return service.credit_state(mid)
 
 
+@app.get("/api/mandates/{mid}/preflight")
+def preflight(mid: str):
+    return service.preflight(mid)
+
+
 @app.post("/api/mandates/{mid}/dev-pull")
 def dev_pull(mid: str, sample: int = 10):
     return {"result": service.run_dev(mid, sample), "credits": service.credit_state(mid)}

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Ctx } from "@/lib/workflow";
-import { api, Candidate, Ranked, STATUS_FLOW } from "@/lib/api";
+import { api, Candidate, Ranked, Preflight, STATUS_FLOW } from "@/lib/api";
 import { Card, Button, Pill, TierBadge, Bar, Stat, SectionTitle, Kicker, Dot, TIER_HEX, fitColor } from "@/components/ui";
 
 /* ----------------------------- shared bits ----------------------------- */
@@ -167,6 +167,76 @@ export function TargetingStage({ ctx }: { ctx: Ctx }) {
   );
 }
 
+/* ----------------------------- S3.5 Pre-flight -------------------------- */
+
+const SEV: Record<string, { tone: string; label: string; hex: string }> = {
+  high: { tone: "rose", label: "high", hex: "#9d3a30" },
+  medium: { tone: "amber", label: "medium", hex: "#9a6b1f" },
+  low: { tone: "zinc", label: "low", hex: "#a09a8b" },
+};
+
+export function PreflightStage({ ctx }: { ctx: Ctx }) {
+  const [pf, setPf] = useState<Preflight | null>(null);
+  const [applied, setApplied] = useState<Record<string, boolean>>({});
+  useEffect(() => { api.preflight(ctx.id).then(setPf); }, [ctx.id]);
+  if (!pf) return <Empty msg="Analyzing filter…" />;
+
+  const gained = pf.risks.reduce((a, r) => a + (applied[r.id] ? r.weight : 0), 0);
+  const health = Math.min(pf.max_health, pf.health + gained);
+  const openHigh = pf.risks.some((r) => r.severity !== "low" && !applied[r.id]);
+  const healthHex = health >= 88 ? "#1f4d44" : health >= 70 ? "#9a6b1f" : "#9d3a30";
+
+  return (
+    <>
+      <SectionTitle kicker="Setup · 04 — Pre-flight" title="Pressure-test the filter before you spend"
+        sub="Every credit is a decision. Before the production pull, Jatayu flags where the filter is brittle — hard gates on sparse fields, exclusions that over-reach — and proposes fixes. The Calibrate pull then verifies them on real data." />
+
+      <Card className="mb-5 flex items-center gap-6 p-6">
+        <div className="text-center">
+          <p className="font-display text-[44px] leading-none tnum" style={{ color: healthHex }}>{health}</p>
+          <p className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--color-faint)]">filter health</p>
+        </div>
+        <div className="flex-1">
+          <Bar value={health} color={healthHex} className="h-2.5" />
+          <p className="mt-2 text-sm text-[var(--color-muted)]">
+            {openHigh ? "Open risks could drop real candidates from a pool of only ~15–20. Apply the fixes, or accept and verify on the calibration pull."
+              : "No material risks outstanding — the filter looks production-ready. Calibrate to confirm on real data."}
+          </p>
+        </div>
+        {!openHigh && <Pill tone="emerald">production-ready</Pill>}
+      </Card>
+
+      <div className="space-y-3">
+        {pf.risks.map((r) => {
+          const done = applied[r.id];
+          const sev = SEV[r.severity];
+          return (
+            <Card key={r.id} className={`p-5 transition ${done ? "opacity-70" : ""}`}>
+              <div className="flex items-start gap-3">
+                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: sev.hex }} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-medium">{r.title}</span>
+                    <Pill tone={sev.tone}>{sev.label} risk</Pill>
+                    <code className="rounded bg-black/[.04] px-1.5 py-0.5 text-[11px] text-[var(--color-muted)]">{r.query_shape}</code>
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{r.detail}</p>
+                  <p className="mt-2 text-sm"><span className="font-medium text-[var(--color-accent)]">Fix → </span>{r.fix}</p>
+                </div>
+                <button onClick={() => setApplied({ ...applied, [r.id]: !done })}
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition ${done ? "bg-[#1f4d44]/12 text-[#1f4d44]" : "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-ink)]"}`}>
+                  {done ? "Applied ✓" : "Apply fix"}
+                </button>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+      <p className="mt-4 text-xs text-[var(--color-faint)]">{pf.note} In demo mode, applying a fix is illustrative; in live mode it rewrites the query before the pull.</p>
+    </>
+  );
+}
+
 /* ----------------------------- S4 Calibrate ----------------------------- */
 
 export function CalibrateStage({ ctx }: { ctx: Ctx }) {
@@ -175,7 +245,7 @@ export function CalibrateStage({ ctx }: { ctx: Ctx }) {
   const benches = ctx.calibration;
   return (
     <>
-      <SectionTitle kicker="Setup · 04 — Calibrate" title="Validate before you spend"
+      <SectionTitle kicker="Setup · 05 — Calibrate" title="Validate before you spend"
         sub="An expert pulls a handful of benchmark candidates and reads them first — confirming the spec and filters are right before committing the production budget. Mark each, then continue." />
       {!benches ? (
         <Card className="flex flex-wrap items-center justify-between gap-4 p-7">
@@ -217,7 +287,7 @@ export function CalibrateStage({ ctx }: { ctx: Ctx }) {
 export function SourceStage({ ctx }: { ctx: Ctx }) {
   return (
     <>
-      <SectionTitle kicker="Setup · 05 — Source" title="Run the production longlist"
+      <SectionTitle kicker="Setup · 06 — Source" title="Run the production longlist"
         sub="One production search plus collection of the refined universe → the raw longlist, with every profile scored on gates and weighted sub-scores. Every call is logged to the credit ledger." />
       <Card className="flex flex-wrap items-center justify-between gap-4 p-7">
         <div>

@@ -153,6 +153,61 @@ def mandate_detail(mid: str) -> dict:
     }
 
 
+def preflight(mid: str) -> dict:
+    """Static pre-flight risk analysis of the filter — before any credits are spent.
+
+    Inspects the sourcing config + known Coresignal data-quality patterns and flags
+    brittleness that would hurt recall on a tiny pool. Each risk carries a fix and a
+    health weight; the UI lets the operator 'apply' fixes and watch projected health
+    rise. The Calibrate pull then verifies these empirically.
+    """
+    cfg = _cfg(mid)
+    s = cfg.sourcing
+    risks: list[dict] = []
+
+    def risk(rid, sev, title, detail, shape, fix, weight):
+        risks.append({"id": rid, "severity": sev, "title": title, "detail": detail,
+                      "query_shape": shape, "fix": fix, "weight": weight})
+
+    ec = s.company_filters.employee_count
+    if ec and (ec.gte is not None or ec.lte is not None):
+        risk("size_hard", "high", "Hard filter on a sparse field",
+             "`experience.company_size_employees_count` is a required range, but that field "
+             "is null for a large share of Coresignal profiles. Anyone whose employer has no "
+             "size data is dropped — even if they match everything else. On a ~15–20 person "
+             "pool, that risks losing real candidates.",
+             "range: experience.company_size_employees_count (must)",
+             "Make firm size a ranking boost (should), not a hard requirement.", 24)
+
+    if s.skills_any:
+        risk("skills_gate", "medium", "Self-reported field used as a gate",
+             f"{len(s.skills_any)} skills are required (AND). Skills are self-reported and "
+             "frequently absent on strong senior profiles — requiring them over-filters.",
+             "bool: skills (must, minimum_should_match 1)",
+             "Demote skills to a scoring signal; don't gate the pull on them.", 14)
+
+    broad = [i for i in s.exclusions.industries_none if i in {"Banking", "Insurance", "Accounting", "Financial Services"}]
+    if broad:
+        risk("broad_exclusion", "medium", "Exclusion spans the entire career history",
+             f"Excluding {', '.join(broad)} on ANY past role removes candidates who did an early "
+             "stint there — common among strong AM compliance heads who started in banking or Big-4.",
+             "must_not: nested experience.company_industry (any role)",
+             "Scope the exclusion to the current employer, or penalise it in scoring instead.", 12)
+
+    must_clauses = sum([bool(s.location_countries), 1, bool(s.skills_any), bool(s.title_keywords_any)])
+    if must_clauses >= 4:
+        risk("tight_stack", "low", "Several hard filters stacked",
+             f"{must_clauses} independent AND-clauses. On a tiny pool, each extra hard clause "
+             "risks excluding real members. Confirm recall on the calibration pull.",
+             "bool.must × " + str(must_clauses),
+             "Verify on the dev pull; relax the weakest clause if the sample is thin.", 6)
+
+    base = max(15, 100 - sum(r["weight"] for r in risks))
+    return {"health": base, "max_health": 100, "risks": risks,
+            "note": "Static estimate from query shape + known Coresignal data-quality patterns. "
+                    "The Calibrate pull verifies these on real data before the production spend."}
+
+
 def credit_state(mid: str) -> dict:
     led = _state(mid)["ledger"]
     return {"spent": led.total_spent, "cap": led.hard_cap, "remaining": led.remaining,

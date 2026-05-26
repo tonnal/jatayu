@@ -6,7 +6,7 @@ import { api, MandateDetail, Credits, Candidate, Ranked, ShortlistResp, ClientRe
 import { Ctx, StageKey } from "@/lib/workflow";
 import { Button, Bar } from "@/components/ui";
 import {
-  BriefStage, MarketStage, TargetingStage, CalibrateStage, SourceStage,
+  BriefStage, MarketStage, TargetingStage, PreflightStage, CalibrateStage, SourceStage,
   LonglistStage, ShortlistStage, EngagementStage, ReportStage, CandidateDrawer,
 } from "@/components/stages";
 
@@ -15,6 +15,7 @@ const STEPS: Step[] = [
   { key: "brief", label: "Brief", phase: "Setup" },
   { key: "market", label: "Market Map", phase: "Setup" },
   { key: "targeting", label: "Targeting", phase: "Setup" },
+  { key: "preflight", label: "Pre-flight", phase: "Setup" },
   { key: "calibrate", label: "Calibrate", phase: "Setup" },
   { key: "source", label: "Source", phase: "Setup" },
   { key: "longlist", label: "Longlist", phase: "Pipeline" },
@@ -44,6 +45,12 @@ export default function Workspace() {
     api.credits(id).then(setCredits);
   }, [id]);
   useEffect(() => { refresh(); }, [refresh]);
+  // deep-link to a setup step (?s=preflight) — shareable, back-friendly
+  useEffect(() => {
+    const k = new URLSearchParams(window.location.search).get("s");
+    const i = STEPS.findIndex((x) => x.key === k);
+    if (i > 0 && STEPS[i].phase === "Setup") setIdx(i);
+  }, []);
 
   async function run(tag: string, fn: () => Promise<void>) { setBusy(tag); try { await fn(); } finally { setBusy(null); } }
 
@@ -125,6 +132,7 @@ export default function Workspace() {
           {stage === "brief" && <BriefStage ctx={ctx} />}
           {stage === "market" && <MarketStage ctx={ctx} />}
           {stage === "targeting" && <TargetingStage ctx={ctx} />}
+          {stage === "preflight" && <PreflightStage ctx={ctx} />}
           {stage === "calibrate" && <CalibrateStage ctx={ctx} />}
           {stage === "source" && <SourceStage ctx={ctx} />}
           {stage === "longlist" && <LonglistStage ctx={ctx} />}

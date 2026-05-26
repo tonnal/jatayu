@@ -1,7 +1,7 @@
 import { MandateDetail, Credits, Candidate, Ranked, ShortlistResp, ClientReport, NegHeuristic } from "@/lib/api";
 
 export type StageKey =
-  | "brief" | "market" | "targeting" | "calibrate" | "source"
+  | "brief" | "market" | "targeting" | "preflight" | "calibrate" | "source"
   | "longlist" | "shortlist" | "engagement" | "report";
 
 export type Ctx = {
