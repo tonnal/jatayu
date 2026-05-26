@@ -169,10 +169,10 @@ export function TargetingStage({ ctx }: { ctx: Ctx }) {
 
 /* ----------------------------- S3.5 Pre-flight -------------------------- */
 
-const SEV: Record<string, { tone: string; label: string; hex: string }> = {
-  high: { tone: "rose", label: "high", hex: "#9d3a30" },
-  medium: { tone: "amber", label: "medium", hex: "#9a6b1f" },
-  low: { tone: "zinc", label: "low", hex: "#a09a8b" },
+const STATUS: Record<string, { hex: string; glyph: string; label: string; tone: string }> = {
+  pass: { hex: "#1f4d44", glyph: "✓", label: "pass", tone: "emerald" },
+  warn: { hex: "#9d3a30", glyph: "!", label: "needs fix", tone: "rose" },
+  info: { hex: "#9a6b1f", glyph: "i", label: "confirm", tone: "amber" },
 };
 
 export function PreflightStage({ ctx }: { ctx: Ctx }) {
@@ -181,15 +181,16 @@ export function PreflightStage({ ctx }: { ctx: Ctx }) {
   useEffect(() => { api.preflight(ctx.id).then(setPf); }, [ctx.id]);
   if (!pf) return <Empty msg="Analyzing filter…" />;
 
-  const gained = pf.risks.reduce((a, r) => a + (applied[r.id] ? r.weight : 0), 0);
+  const gained = pf.checks.reduce((a, c) => a + (applied[c.id] ? c.weight : 0), 0);
   const health = Math.min(pf.max_health, pf.health + gained);
-  const openHigh = pf.risks.some((r) => r.severity !== "low" && !applied[r.id]);
+  const openWarn = pf.checks.some((c) => c.status === "warn" && !applied[c.id]);
   const healthHex = health >= 88 ? "#1f4d44" : health >= 70 ? "#9a6b1f" : "#9d3a30";
+  const passCount = pf.checks.filter((c) => c.status === "pass").length;
 
   return (
     <>
       <SectionTitle kicker="Setup · 04 — Pre-flight" title="Pressure-test the filter before you spend"
-        sub="Every credit is a decision. Before the production pull, Jatayu flags where the filter is brittle — hard gates on sparse fields, exclusions that over-reach — and proposes fixes. The Calibrate pull then verifies them on real data." />
+        sub="Every credit is a decision. Before the production pull, Jatayu audits the filter against known Coresignal data-quality patterns — flagging brittleness and confirming what's already sound. The Calibrate pull then verifies it on real data." />
 
       <Card className="mb-5 flex items-center gap-6 p-6">
         <div className="text-center">
@@ -199,34 +200,37 @@ export function PreflightStage({ ctx }: { ctx: Ctx }) {
         <div className="flex-1">
           <Bar value={health} color={healthHex} className="h-2.5" />
           <p className="mt-2 text-sm text-[var(--color-muted)]">
-            {openHigh ? "Open risks could drop real candidates from a pool of only ~15–20. Apply the fixes, or accept and verify on the calibration pull."
-              : "No material risks outstanding — the filter looks production-ready. Calibrate to confirm on real data."}
+            {openWarn ? "An open issue could drop real candidates from a pool of only ~15–20. Apply the fix, or accept and verify on the calibration pull."
+              : `${passCount} checks pass — the filter is recall-safe and looks production-ready. Calibrate to confirm on real data.`}
           </p>
         </div>
-        {!openHigh && <Pill tone="emerald">production-ready</Pill>}
+        {!openWarn && <Pill tone="emerald">production-ready</Pill>}
       </Card>
 
-      <div className="space-y-3">
-        {pf.risks.map((r) => {
-          const done = applied[r.id];
-          const sev = SEV[r.severity];
+      <div className="space-y-2.5">
+        {pf.checks.map((c) => {
+          const st = STATUS[c.status];
+          const done = applied[c.id];
+          const actionable = !!c.fix && c.status !== "pass";
           return (
-            <Card key={r.id} className={`p-5 transition ${done ? "opacity-70" : ""}`}>
+            <Card key={c.id} className={`p-5 transition ${done ? "opacity-60" : ""}`}>
               <div className="flex items-start gap-3">
-                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: sev.hex }} />
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white" style={{ backgroundColor: done ? "#1f4d44" : st.hex }}>{done ? "✓" : st.glyph}</span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium">{r.title}</span>
-                    <Pill tone={sev.tone}>{sev.label} risk</Pill>
-                    <code className="rounded bg-black/[.04] px-1.5 py-0.5 text-[11px] text-[var(--color-muted)]">{r.query_shape}</code>
+                    <span className="font-medium">{c.title}</span>
+                    <Pill tone={done ? "emerald" : st.tone}>{done ? "resolved" : st.label}</Pill>
+                    <code className="rounded bg-black/[.04] px-1.5 py-0.5 text-[11px] text-[var(--color-muted)]">{c.query_shape}</code>
                   </div>
-                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{r.detail}</p>
-                  <p className="mt-2 text-sm"><span className="font-medium text-[var(--color-accent)]">Fix → </span>{r.fix}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--color-muted)]">{c.detail}</p>
+                  {actionable && <p className="mt-2 text-sm"><span className="font-medium text-[var(--color-accent)]">Fix → </span>{c.fix}</p>}
                 </div>
-                <button onClick={() => setApplied({ ...applied, [r.id]: !done })}
-                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition ${done ? "bg-[#1f4d44]/12 text-[#1f4d44]" : "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-ink)]"}`}>
-                  {done ? "Applied ✓" : "Apply fix"}
-                </button>
+                {actionable && (
+                  <button onClick={() => setApplied({ ...applied, [c.id]: !done })}
+                    className={`shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition ${done ? "bg-[#1f4d44]/12 text-[#1f4d44]" : "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-ink)]"}`}>
+                    {done ? "Applied ✓" : "Apply fix"}
+                  </button>
+                )}
               </div>
             </Card>
           );

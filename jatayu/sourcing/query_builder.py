@@ -43,7 +43,21 @@ def _experience_company_clause(cf: CompanyFilter) -> dict | None:
         if cf.employee_count.lte is not None:
             rng["lte"] = cf.employee_count.lte
         if rng:
-            must.append({"range": {"experience.company_size_employees_count": rng}})
+            # Recall-safe: keep firms whose size is in range OR is UNKNOWN.
+            # company_size is null for many Coresignal profiles, so a bare range
+            # would silently drop real candidates. This only excludes firms with a
+            # KNOWN size outside the band; scoring still reads scale where present.
+            must.append(
+                {
+                    "bool": {
+                        "should": [
+                            {"range": {"experience.company_size_employees_count": rng}},
+                            {"bool": {"must_not": {"exists": {"field": "experience.company_size_employees_count"}}}},
+                        ],
+                        "minimum_should_match": 1,
+                    }
+                }
+            )
 
     if cf.company_keywords_any:
         must.append(
@@ -134,20 +148,7 @@ def build_search_query(sourcing: SourcingConfig, *, size: int = 100) -> dict:
     if company_clause:
         must.append(company_clause)
 
-    # 3) Skills (optional corroboration).
-    if sourcing.skills_any:
-        must.append(
-            {
-                "bool": {
-                    "should": [
-                        {"match": {"skills": s}} for s in sourcing.skills_any
-                    ],
-                    "minimum_should_match": 1,
-                }
-            }
-        )
-
-    # 4) TITLE LAST — broad net; precision came from steps 2-3.
+    # 3) TITLE — broad net; precision came from step 2 (firm attributes).
     if sourcing.title_keywords_any:
         must.append(
             {
@@ -158,7 +159,16 @@ def build_search_query(sourcing: SourcingConfig, *, size: int = 100) -> dict:
             }
         )
 
+    # 4) Skills — a BOOST, not a gate. Skills are self-reported and often absent
+    #    on strong senior profiles, so requiring them would hurt recall. Placed in
+    #    `should` (no minimum_should_match bump) so they rank, never filter.
+    should: list[dict] = [
+        {"match": {"skills": s}} for s in sourcing.skills_any
+    ]
+
     bool_query: dict = {"must": must}
+    if should:
+        bool_query["should"] = should
     if must_not:
         bool_query["must_not"] = must_not
 

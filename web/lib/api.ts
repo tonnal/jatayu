@@ -76,5 +76,5 @@ export type ClientReport = { mandate: string; pool: { longlist: number; shortlis
 export type OverrideBody = { sub_overrides?: Record<string, number>; gate_overrides?: Record<string, boolean>; note?: string };
 export type Draft = { recipient_id: string; recipient_name: string | null; tier: string; channel: string; subject: string; body: string; confidence: string; richness_score: number; known_facts: string[]; hooks: string[]; uncertainty_flags: string[]; review_required: boolean };
 export type OutreachResp = { aidentifi: string; drafts: Draft[]; live_available: boolean };
-export type Risk = { id: string; severity: "high" | "medium" | "low"; title: string; detail: string; query_shape: string; fix: string; weight: number };
-export type Preflight = { health: number; max_health: number; risks: Risk[]; note: string };
+export type Check = { id: string; status: "pass" | "warn" | "info"; title: string; detail: string; query_shape: string; fix: string; weight: number };
+export type Preflight = { health: number; max_health: number; checks: Check[]; note: string };

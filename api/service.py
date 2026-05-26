@@ -163,47 +163,60 @@ def preflight(mid: str) -> dict:
     """
     cfg = _cfg(mid)
     s = cfg.sourcing
-    risks: list[dict] = []
+    checks: list[dict] = []
 
-    def risk(rid, sev, title, detail, shape, fix, weight):
-        risks.append({"id": rid, "severity": sev, "title": title, "detail": detail,
-                      "query_shape": shape, "fix": fix, "weight": weight})
+    def chk(cid, status, title, detail, shape, fix="", weight=0):
+        checks.append({"id": cid, "status": status, "title": title, "detail": detail,
+                       "query_shape": shape, "fix": fix, "weight": weight})
 
     ec = s.company_filters.employee_count
     if ec and (ec.gte is not None or ec.lte is not None):
-        risk("size_hard", "high", "Hard filter on a sparse field",
-             "`experience.company_size_employees_count` is a required range, but that field "
-             "is null for a large share of Coresignal profiles. Anyone whose employer has no "
-             "size data is dropped — even if they match everything else. On a ~15–20 person "
-             "pool, that risks losing real candidates.",
-             "range: experience.company_size_employees_count (must)",
-             "Make firm size a ranking boost (should), not a hard requirement.", 24)
+        chk("size", "pass", "Firm size is recall-safe",
+            "`company_size_employees_count` is null for many profiles, so the size band is "
+            "applied as 'size in range OR size unknown' — profiles with missing size are kept; "
+            "only firms with a KNOWN out-of-band size are dropped.",
+            "should: [range, must_not exists] — recall-safe")
+    else:
+        chk("size", "info", "No firm-size filter",
+            "Size isn't constrained at search time (relied on in scoring instead).", "—")
 
     if s.skills_any:
-        risk("skills_gate", "medium", "Self-reported field used as a gate",
-             f"{len(s.skills_any)} skills are required (AND). Skills are self-reported and "
-             "frequently absent on strong senior profiles — requiring them over-filters.",
-             "bool: skills (must, minimum_should_match 1)",
-             "Demote skills to a scoring signal; don't gate the pull on them.", 14)
+        chk("skills", "pass", "Skills are a boost, not a gate",
+            f"{len(s.skills_any)} skills are in `should` — they rank matching profiles higher "
+            "but never filter, so a strong candidate who omitted them isn't dropped.",
+            "should: skills (no minimum_should_match)")
 
     broad = [i for i in s.exclusions.industries_none if i in {"Banking", "Insurance", "Accounting", "Financial Services"}]
     if broad:
-        risk("broad_exclusion", "medium", "Exclusion spans the entire career history",
-             f"Excluding {', '.join(broad)} on ANY past role removes candidates who did an early "
-             "stint there — common among strong AM compliance heads who started in banking or Big-4.",
-             "must_not: nested experience.company_industry (any role)",
-             "Scope the exclusion to the current employer, or penalise it in scoring instead.", 12)
+        chk("broad_exclusion", "warn", "Exclusion spans the entire career history",
+            f"Excluding {', '.join(broad)} on ANY past role removes candidates who did an early "
+            "stint there — common among strong AM compliance heads.",
+            "must_not: nested experience.company_industry (any role)",
+            "Drop the broad industry exclusion; let the scoring gate handle wrong-pool firms.", 16)
+    else:
+        chk("broad_exclusion", "pass", "No over-broad industry exclusions",
+            "Wrong-pool firms (banks, Big-4, regulators, IFAs) are handled by the "
+            "`am_side_experience` scoring gate, not by excluding all career history.",
+            "gate: am_side_experience (scoring)")
 
-    must_clauses = sum([bool(s.location_countries), 1, bool(s.skills_any), bool(s.title_keywords_any)])
-    if must_clauses >= 4:
-        risk("tight_stack", "low", "Several hard filters stacked",
-             f"{must_clauses} independent AND-clauses. On a tiny pool, each extra hard clause "
-             "risks excluding real members. Confirm recall on the calibration pull.",
-             "bool.must × " + str(must_clauses),
-             "Verify on the dev pull; relax the weakest clause if the sample is thin.", 6)
+    if s.exclusions.company_keywords_none:
+        chk("company_excl", "info", "Company-name exclusions apply to all history",
+            f"{len(s.exclusions.company_keywords_none)} retail/IFA names are excluded on ANY "
+            "experience. Kept deliberately lean; confirm on the dev pull that it isn't dropping "
+            "good candidates with a brief early stint.",
+            "must_not: nested experience.company_name (any role)",
+            "If recall looks thin, scope this to the current employer instead.", 6)
 
-    base = max(15, 100 - sum(r["weight"] for r in risks))
-    return {"health": base, "max_health": 100, "risks": risks,
+    must_clauses = sum([bool(s.location_countries), 1, bool(s.title_keywords_any)])
+    chk("pool", "info", "Tight pool — verify recall on Calibrate",
+        f"{must_clauses} hard AND-clauses against a true pool of only ~15–20 people. The filter "
+        "looks sound on paper; the calibration pull is what confirms it empirically.",
+        f"bool.must × {must_clauses}",
+        "", 4)
+
+    deductions = sum(c["weight"] for c in checks if c["status"] in ("warn", "info"))
+    health = max(20, 100 - deductions)
+    return {"health": health, "max_health": 100, "checks": checks,
             "note": "Static estimate from query shape + known Coresignal data-quality patterns. "
                     "The Calibrate pull verifies these on real data before the production spend."}
 

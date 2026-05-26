@@ -65,22 +65,22 @@ sourcing:
   # The negative space. These cut the dominant decoration archetypes at search
   # time so we don't pay collect credits on them.
   exclusions:
+    # Cheap, safe title exclusions (junk roles) — these rarely catch good people.
     title_keywords_none:
       - "Internal Audit"
       - "Auditor"
       - "Intern"
       - "Trainee"
+    # Clearest retail/IFA distributor names. Kept lean: applied to ANY experience,
+    # so over-listing here would drop candidates with a brief early stint.
     company_keywords_none:
-      # Retail / IFA distributors — wrong client type, wrong license.
       - "Financial Advisers"
       - "Financial Advisory"
-      - "Wealth Advisory"
-      - "Insurance"
-      - "Assurance"
-    industries_none:
-      - "Banking"
-      - "Insurance"
-      - "Accounting"
+    # Broad industry exclusions (Banking/Insurance/Accounting) intentionally REMOVED:
+    # they collide with the included "Financial Services" and would drop strong
+    # candidates who did an early bank/Big-4 stint. Wrong-pool firms are handled by
+    # the scoring GATES (am_side_experience) instead — precise without killing recall.
+    industries_none: []
 
   dev:
     sample_size: 10   # collect a tiny sample to validate the filter
