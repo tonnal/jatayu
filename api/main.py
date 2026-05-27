@@ -52,6 +52,32 @@ def preflight(mid: str):
     return service.preflight(mid)
 
 
+class GenerateBody(BaseModel):
+    brief: str
+
+
+@app.post("/api/generate")
+def generate(body: GenerateBody):
+    """LLM-generate a sourcing strategy from a brief -> working config 'generated'."""
+    return service.generate_strategy_for(body.brief)
+
+
+class WorkingPatch(BaseModel):
+    sourcing: dict = {}
+    off_limits: list[str] | None = None
+    market_map: dict | None = None
+
+
+@app.post("/api/mandates/{mid}/working")
+def update_working(mid: str, body: WorkingPatch):
+    patch = {"sourcing": body.sourcing}
+    if body.off_limits is not None:
+        patch["off_limits"] = body.off_limits
+    if body.market_map is not None:
+        patch["market_map"] = body.market_map
+    return service.update_working(mid, patch)
+
+
 @app.post("/api/mandates/{mid}/dev-pull")
 def dev_pull(mid: str, sample: int = 10):
     return {"result": service.run_dev(mid, sample), "credits": service.credit_state(mid)}

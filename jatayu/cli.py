@@ -111,6 +111,35 @@ def run_all(
     console.print(f"[bold]{run.ledger.summary()}[/bold]")
 
 
+@app.command("generate")
+def generate(
+    brief_file: str = typer.Option(None, help="Path to a text file with the mandate brief."),
+    brief: str = typer.Option(None, help="The mandate brief text (inline)."),
+    out: str = "configs/generated.yaml",
+) -> None:
+    """LLM-generate a full sourcing strategy from a mandate brief; save as a config."""
+    import yaml
+    from .strategy import generate_strategy
+
+    text = open(brief_file, encoding="utf-8").read() if brief_file else brief
+    if not text:
+        console.print("[red]Provide --brief or --brief-file[/red]"); raise typer.Exit(1)
+
+    console.print("[dim]Generating strategy via LLM…[/dim]")
+    cfg = generate_strategy(text, api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    Path(out).write_text(yaml.safe_dump(cfg.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
+
+    console.print(f"\n[bold]{cfg.mandate.name}[/bold]")
+    console.print(f"  industries: {cfg.sourcing.company_filters.industries_any}")
+    ec = cfg.sourcing.company_filters.employee_count
+    console.print(f"  firm size: {ec.gte if ec else '—'}–{ec.lte if ec else '—'}")
+    console.print(f"  titles: {cfg.sourcing.title_keywords_any}")
+    console.print(f"  gates: {[g.id for g in cfg.scoring.gates]}")
+    console.print(f"  sub-scores: {[(s.id, s.weight) for s in cfg.scoring.sub_scores]}")
+    console.print(f"  market map core: {cfg.market_map.target_companies.get('core', [])}")
+    console.print(f"\nsaved -> {out}  (edit it, then: jatayu validate-filter --config {out})")
+
+
 @app.command("outreach")
 def outreach(
     aidentifi: str = "configs/aidentifi.yaml",

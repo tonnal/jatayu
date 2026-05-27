@@ -28,10 +28,44 @@ _CONFIGS = {"mandate_a": "mandate_a.yaml", "mandate_b": "mandate_b.yaml"}
 
 # per-mandate run state
 _STORE: dict[str, dict] = {}
+# LLM-generated working configs, keyed by id (the "generate -> edit -> pull" flow)
+_WORKING: dict[str, MandateConfig] = {}
 
 
 def _cfg(mid: str) -> MandateConfig:
+    if mid in _WORKING:
+        return _WORKING[mid]
     return MandateConfig.load(CONFIG_DIR / _CONFIGS[mid])
+
+
+def generate_strategy_for(brief: str, mid: str = "generated") -> dict:
+    """LLM-generate a sourcing strategy from a brief; store it as the working config."""
+    from jatayu.strategy import generate_strategy
+    cfg = generate_strategy(brief)
+    _WORKING[mid] = cfg
+    _STORE.pop(mid, None)  # reset any prior run state
+    return mandate_detail(mid)
+
+
+def update_working(mid: str, patch: dict) -> dict:
+    """Apply human edits (add/subtract) to the working config's editable fields."""
+    cfg = _cfg(mid)
+    data = cfg.model_dump()
+    src = patch.get("sourcing", {})
+    if "industries_any" in src:
+        data["sourcing"]["company_filters"]["industries_any"] = src["industries_any"]
+    if "title_keywords_any" in src:
+        data["sourcing"]["title_keywords_any"] = src["title_keywords_any"]
+    if "employee_count" in src:
+        data["sourcing"]["company_filters"]["employee_count"] = src["employee_count"]
+    if "exclude_company_keywords" in src:
+        data["sourcing"]["exclusions"]["company_keywords_none"] = src["exclude_company_keywords"]
+    if "off_limits" in patch:
+        data["off_limits"] = patch["off_limits"]
+    if "market_map" in patch:
+        data["market_map"]["target_companies"] = patch["market_map"]
+    _WORKING[mid] = MandateConfig.model_validate(data)
+    return mandate_detail(mid)
 
 
 def _state(mid: str) -> dict:
