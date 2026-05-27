@@ -16,7 +16,8 @@ from pathlib import Path
 from jatayu.config import FitTier, MandateConfig
 from jatayu.coresignal.credits import CreditLedger
 from jatayu.scoring.profile import Profile, normalize_profile
-from jatayu.scoring.scorer import ScoreResult, recompute_with_overrides
+from jatayu.scoring.scorer import ScoreResult, Scorer, recompute_with_overrides
+from jatayu.coresignal.client import CoresignalClient
 from jatayu.sourcing.query_builder import build_search_query
 from jatayu import exporters
 
@@ -35,15 +36,23 @@ _WORKING: dict[str, MandateConfig] = {}
 def _cfg(mid: str) -> MandateConfig:
     if mid in _WORKING:
         return _WORKING[mid]
+    if mid == "generated" and (CONFIG_DIR / "generated.yaml").exists():
+        cfg = MandateConfig.load(CONFIG_DIR / "generated.yaml")
+        _WORKING[mid] = cfg  # rehydrate after a server reload
+        return cfg
     return MandateConfig.load(CONFIG_DIR / _CONFIGS[mid])
 
 
 def generate_strategy_for(brief: str, mid: str = "generated") -> dict:
     """LLM-generate a sourcing strategy from a brief; store it as the working config."""
+    import yaml
     from jatayu.strategy import generate_strategy
     cfg = generate_strategy(brief)
     _WORKING[mid] = cfg
     _STORE.pop(mid, None)  # reset any prior run state
+    # persist so it survives a dev-server reload
+    (CONFIG_DIR / "generated.yaml").write_text(
+        yaml.safe_dump(cfg.model_dump(mode="json"), sort_keys=False), encoding="utf-8")
     return mandate_detail(mid)
 
 
@@ -274,24 +283,40 @@ def _tier_distribution(profiles: list[Profile]) -> dict:
     return dict(c)
 
 
+def _use_live(mid: str) -> bool:
+    """The LLM-generated flow runs against live Coresignal; sample mandates are demo."""
+    return mid in _WORKING and live_available()
+
+
+def _live_search_collect(cfg: MandateConfig, ledger: CreditLedger, stage: str,
+                         purpose: str, n: int) -> tuple[int, list[Profile]]:
+    q = build_search_query(cfg.sourcing)
+    with CoresignalClient(ledger, stage=stage) as cs:
+        ids = cs.search(q, purpose=f"{purpose}: search")
+        raw = cs.collect_many(ids[:n], purpose=f"{purpose}: collect")
+    return len(ids), [normalize_profile(r, cfg.firm_taxonomy) for r in raw]
+
+
 def run_dev(mid: str, sample: int = 10) -> dict:
     cfg = _cfg(mid)
     st = _state(mid)
-    raw = demo_data.profiles_for(mid)
-    st["ledger"].record(endpoint="search/es_dsl", query_or_id="<filter>", credit_cost=1,
-                        profiles_returned=len(raw), stage="dev",
-                        stage_purpose="filter validation", useful_yes_no="yes",
-                        notes="demo")
-    sample_raw = raw[:sample]
-    profiles = [normalize_profile(r, cfg.firm_taxonomy) for r in sample_raw]
-    for p in profiles:
-        st["ledger"].record(endpoint=f"collect/{p.coresignal_id}", query_or_id=p.coresignal_id,
-                            credit_cost=1, profiles_returned=1, stage="dev",
-                            stage_purpose="inspect sample", useful_yes_no="yes", notes="demo")
+    if _use_live(mid):
+        n_ids, profiles = _live_search_collect(cfg, st["ledger"], "dev", "filter validation", sample)
+    else:
+        raw = demo_data.profiles_for(mid)
+        n_ids = len(raw)
+        st["ledger"].record(endpoint="search/es_dsl", query_or_id="<filter>", credit_cost=1,
+                            profiles_returned=len(raw), stage="dev",
+                            stage_purpose="filter validation", useful_yes_no="yes", notes="demo")
+        profiles = [normalize_profile(r, cfg.firm_taxonomy) for r in raw[:sample]]
+        for p in profiles:
+            st["ledger"].record(endpoint=f"collect/{p.coresignal_id}", query_or_id=p.coresignal_id,
+                                credit_cost=1, profiles_returned=1, stage="dev",
+                                stage_purpose="inspect sample", useful_yes_no="yes", notes="demo")
     dist = _tier_distribution(profiles)
     core_adj = dist.get("core", 0) + dist.get("adjacent", 0)
     return {
-        "n_ids": len(raw),
+        "n_ids": n_ids,
         "sampled": len(profiles),
         "tier_distribution": dist,
         "precision_estimate": round(core_adj / len(profiles), 3) if profiles else 0,
@@ -302,15 +327,18 @@ def run_dev(mid: str, sample: int = 10) -> dict:
 def run_production(mid: str, limit: int = 200) -> dict:
     cfg = _cfg(mid)
     st = _state(mid)
-    raw = demo_data.profiles_for(mid)[:limit]
-    st["ledger"].record(endpoint="search/es_dsl", query_or_id="<filter>", credit_cost=1,
-                        profiles_returned=len(raw), stage="production",
-                        stage_purpose="production search", useful_yes_no="yes", notes="demo")
-    profiles = [normalize_profile(r, cfg.firm_taxonomy) for r in raw]
-    for p in profiles:
-        st["ledger"].record(endpoint=f"collect/{p.coresignal_id}", query_or_id=p.coresignal_id,
-                            credit_cost=1, profiles_returned=1, stage="production",
-                            stage_purpose="production collect", useful_yes_no="yes", notes="demo")
+    if _use_live(mid):
+        _, profiles = _live_search_collect(cfg, st["ledger"], "production", "production pull", limit)
+    else:
+        raw = demo_data.profiles_for(mid)[:limit]
+        st["ledger"].record(endpoint="search/es_dsl", query_or_id="<filter>", credit_cost=1,
+                            profiles_returned=len(raw), stage="production",
+                            stage_purpose="production search", useful_yes_no="yes", notes="demo")
+        profiles = [normalize_profile(r, cfg.firm_taxonomy) for r in raw]
+        for p in profiles:
+            st["ledger"].record(endpoint=f"collect/{p.coresignal_id}", query_or_id=p.coresignal_id,
+                                credit_cost=1, profiles_returned=1, stage="production",
+                                stage_purpose="production collect", useful_yes_no="yes", notes="demo")
     st["profiles"] = profiles
     exporters.export_raw_pull(profiles, Path("data/output") / f"{mid}_raw_pull.csv")
     return {"count": len(profiles), "tier_distribution": _tier_distribution(profiles),
@@ -322,9 +350,11 @@ def run_score(mid: str) -> dict:
     st = _state(mid)
     if not st["profiles"]:
         run_production(mid)
+    live = _use_live(mid)
+    scorer = Scorer(cfg) if live else None
     pairs = []
     for p in st["profiles"]:
-        r = mock_score(p, cfg)
+        r = scorer.score(p) if live else mock_score(p, cfg)
         st["pairs"][p.coresignal_id] = (p, r)
         pairs.append((p, r))
     exporters.export_scoring_intermediate(cfg, pairs, Path("data/output") / f"{mid}_scoring.csv")
@@ -363,6 +393,12 @@ def _ranked(mid: str) -> dict:
 def calibrate(mid: str, sample: int = 8) -> dict:
     cfg = _cfg(mid)
     st = _state(mid)
+    if _use_live(mid):
+        _, profiles = _live_search_collect(cfg, st["ledger"], "dev", "calibration benchmark", sample)
+        scorer = Scorer(cfg)
+        benches = [{"profile": profile_view(p), "score": score_view(cfg, scorer.score(p)),
+                    "verdict": st["calibration"].get(p.coresignal_id, "none")} for p in profiles]
+        return {"benchmarks": benches}
     raw = demo_data.profiles_for(mid)[:sample]
     st["ledger"].record(endpoint="search/es_dsl", query_or_id="<calibration>", credit_cost=1,
                         profiles_returned=len(raw), stage="dev",

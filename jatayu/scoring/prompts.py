@@ -56,12 +56,16 @@ def build_user_prompt(profile: Profile, cfg: MandateConfig) -> str:
     )
     if profile.headline:
         lines.append(f"Headline/summary: {profile.headline}")
-    if profile.skills:
-        lines.append(f"Skills: {', '.join(profile.skills[:25])}")
-    if profile.certifications:
-        lines.append(f"Certifications: {', '.join(profile.certifications[:15])}")
-    if profile.educations:
-        lines.append(f"Education: {'; '.join(profile.educations[:5])}")
+    # Real Coresignal lists can contain nulls/non-strings — coerce and drop blanks.
+    skills = [str(s) for s in profile.skills[:25] if s]
+    certs = [str(c) for c in profile.certifications[:15] if c]
+    edus = [str(e) for e in profile.educations[:5] if e]
+    if skills:
+        lines.append(f"Skills: {', '.join(skills)}")
+    if certs:
+        lines.append(f"Certifications: {', '.join(certs)}")
+    if edus:
+        lines.append(f"Education: {'; '.join(edus)}")
 
     lines.append("\n## Career history (most relevant signal — read firm types):")
     for x in profile.experiences:

@@ -25,7 +25,9 @@ const STEPS: Step[] = [
 ];
 
 export default function Workspace() {
-  const id = String(useParams().id);
+  const urlId = String(useParams().id);
+  const [id, setId] = useState(urlId);  // becomes "generated" after LLM analysis
+  const [generating, setGenerating] = useState(false);
   const [detail, setDetail] = useState<MandateDetail | null>(null);
   const [credits, setCredits] = useState<Credits | null>(null);
   const [idx, setIdx] = useState(0);
@@ -62,6 +64,17 @@ export default function Workspace() {
     if (s === "longlist") api.candidates(id).then((r) => r.candidates.length && setRanked(r));
   }, [id]);
 
+  const onGenerate = async (brief: string) => {
+    setGenerating(true);
+    try {
+      const d = await api.generate(brief);
+      setDetail(d); setHeuristics(d.negative_heuristics); setOffLimits(d.off_limits);
+      setCalibration(null); setRanked(null); setShortlist(null); setReport(null);
+      setId("generated");
+      api.credits("generated").then(setCredits);
+    } finally { setGenerating(false); }
+  };
+
   const runCalibrate = () => run("calibrate", async () => { const r = await api.calibrate(id, 8); setCalibration(r.result.benchmarks); setCredits(r.credits); });
   const sendFeedback = async (v: Record<string, string>) => { const r = await api.calibrateFeedback(id, v); return { note: r.note }; };
   const runSource = () => run("source", async () => {
@@ -95,7 +108,8 @@ export default function Workspace() {
 
   const ctx: Ctx = {
     id, detail, credits, busy, heuristics, setHeuristics, offLimits, setOffLimits,
-    calibration, ranked, shortlist, report, go: goKey, runCalibrate, sendFeedback, runSource,
+    calibration, ranked, shortlist, report, go: goKey, onGenerate, generating,
+    runCalibrate, sendFeedback, runSource,
     doTriage, doStatus, openCandidate: setSel, sourced,
   };
 

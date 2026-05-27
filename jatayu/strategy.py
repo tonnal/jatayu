@@ -42,6 +42,16 @@ observable signal that stands in for it (the "signal map").
 - GATES ARE INDEPENDENT THRESHOLDS. A candidate who fails a hard gate is a non-fit \
 regardless of other strengths — don't average a fatal flaw away. Sub-score weights \
 must sum to 1.0.
+- BE SPARING WITH HARD GATES. A hard gate is allowed ONLY for the few conditions \
+that are (a) categorically disqualifying AND (b) reliably observable on a profile: \
+geography, the presence of buy-side asset-management experience, and the \
+seniority/experience band. That's it — usually 2-3 hard gates. \
+NEVER hard-gate an attribute that is rarely stated explicitly on a LinkedIn-style \
+profile — specifically NEVER hard-gate: AI/accredited-investor onboarding exposure, \
+VCC familiarity, MAS/regulatory fluency, open-architecture exposure, or commercial \
+posture. Those are exactly the proxies you INFER, so they belong as weighted \
+SUB-SCORES. Hard-gating them collapses the shortlist to near-zero because the \
+evidence is almost never on the profile.
 
 Produce a complete, internally consistent strategy. Call submit_strategy once."""
 
@@ -169,7 +179,9 @@ def _normalize_strategy(payload: dict) -> dict:
                     "description": payload.get("_brief", "")},
         "sourcing": sourcing,
         "firm_taxonomy": _derive_taxonomy(sourcing, market_map),
-        "scoring": {"model": os.environ.get("JATAYU_SCORING_MODEL", "claude-opus-4-7"),
+        # Per-candidate scoring runs on Sonnet for speed across the whole pull;
+        # the strategic GENERATION above uses Opus. (Cost is rounding error per the brief.)
+        "scoring": {"model": "claude-sonnet-4-6",
                     "shortlist_threshold": 35,
                     "gates": payload["gates"], "sub_scores": subs},
         "spec": payload["spec"],

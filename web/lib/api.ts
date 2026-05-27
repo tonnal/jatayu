@@ -17,6 +17,9 @@ export const api = {
   mandate: (id: string) => j<MandateDetail>(`/api/mandates/${id}`),
   credits: (id: string) => j<Credits>(`/api/mandates/${id}/credits`),
   preflight: (id: string) => j<Preflight>(`/api/mandates/${id}/preflight`),
+  generate: (brief: string) => j<MandateDetail>("/api/generate", { method: "POST", body: JSON.stringify({ brief }) }),
+  updateWorking: (id: string, patch: Record<string, unknown>) =>
+    j<MandateDetail>(`/api/mandates/${id}/working`, { method: "POST", body: JSON.stringify(patch) }),
 
   calibrate: (id: string, sample = 8) =>
     j<{ result: { benchmarks: Candidate[] }; credits: Credits }>(`/api/mandates/${id}/calibrate?sample=${sample}`, { method: "POST" }),

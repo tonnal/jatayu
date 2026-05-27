@@ -16,6 +16,8 @@ export type Ctx = {
   shortlist: ShortlistResp | null;
   report: ClientReport | null;
   go: (s: StageKey) => void;
+  onGenerate: (brief: string) => Promise<void>;
+  generating: boolean;
   runCalibrate: () => void;
   sendFeedback: (v: Record<string, string>) => Promise<{ note: string } | void>;
   runSource: () => void;

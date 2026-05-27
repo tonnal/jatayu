@@ -8,8 +8,10 @@ from jatayu.config import MandateConfig
 from jatayu.coresignal.credits import CreditLedger
 from jatayu.pipeline import JatayuRun
 
-n = int(sys.argv[1]) if len(sys.argv) > 1 else 12
-cfg = MandateConfig.load("configs/mandate_a.yaml")
+config = sys.argv[1] if len(sys.argv) > 1 else "configs/mandate_a.yaml"
+n = int(sys.argv[2]) if len(sys.argv) > 2 else 12
+cfg = MandateConfig.load(config)
+print(f"config: {config}")
 run = JatayuRun(cfg=cfg, ledger=CreditLedger(hard_cap=300))
 rep = run.validate_filter(sample_size=n)
 
