@@ -85,7 +85,6 @@ class Scorer:
         resp = client.messages.create(
             model=self.model,
             max_tokens=1500,
-            temperature=0,
             system=SYSTEM,
             tools=[tool],
             tool_choice={"type": "tool", "name": "submit_assessment"},

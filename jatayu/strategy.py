@@ -217,12 +217,15 @@ def generate_strategy(brief: str, *, api_key: str | None = None,
     client = anthropic.Anthropic(api_key=key)
     resp = client.messages.create(
         model=model or os.environ.get("JATAYU_SCORING_MODEL", "claude-opus-4-7"),
-        max_tokens=3000, temperature=0.2, system=SYSTEM, tools=[strategy_tool()],
+        max_tokens=8000, system=SYSTEM, tools=[strategy_tool()],
         tool_choice={"type": "tool", "name": "submit_strategy"},
         messages=[{"role": "user", "content": _user_prompt(brief)}],
     )
     payload = next((b.input for b in resp.content if getattr(b, "type", None) == "tool_use"), None)
     if payload is None:
         raise RuntimeError("Model did not return submit_strategy.")
+    # Some models nest the whole object under a single "strategy" key — unwrap it.
+    if "sourcing" not in payload and isinstance(payload.get("strategy"), dict):
+        payload = payload["strategy"]
     payload["_brief"] = brief.strip()
     return MandateConfig.model_validate(_normalize_strategy(payload))

@@ -191,7 +191,6 @@ class OutreachGenerator:
         resp = client.messages.create(
             model=self.model,
             max_tokens=1200,
-            temperature=0.4,  # a little warmth, still grounded
             system=SYSTEM,
             tools=[_tool_schema()],
             tool_choice={"type": "tool", "name": "submit_outreach"},
