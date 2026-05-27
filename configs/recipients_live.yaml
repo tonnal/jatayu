@@ -1,0 +1,85 @@
+# Q2 recipients — REAL senior decision-makers sourced from Coresignal (SG).
+# 3 rich + 2 deliberately sparse (family-office / thin-presence). The sparse two
+# are trimmed to the genuinely-knowable minimum (name + role + firm) — the real
+# case for principals who keep a minimal public footprint. The generator must NOT
+# invent anything beyond these facts.
+recipients:
+  - id: '8264323'
+    name: Haryanto Soemito
+    title: Co-Founder & Managing Director
+    company: Sayris Capital
+    company_type: Investment Management
+    location: Singapore
+    headline: Co-Founder of Sayris Capital
+    about: An investor and strategic adviser focused on sustainable food systems.
+    experience:
+      - title: Co-Founder & Managing Director
+        company: Sayris Capital
+        dates: 2019-06–present
+      - title: Advisor
+        company: Eat Plant Love
+        dates: 2022-12–present
+      - title: Partner
+        company: Team Flash
+        dates: 2019-03–present
+    source: coresignal
+
+  - id: '540192625'
+    name: Willy Ballmann
+    title: Private Investor
+    company: Aoyama Holdings
+    company_type: Investment Management
+    location: Singapore
+    headline: Investor; formerly Managing Partner & COO at Dymon Asia Capital
+    experience:
+      - title: Private Investor
+        company: Aoyama Holdings
+        dates: 2015-05–present
+      - title: Managing Partner & COO
+        company: Dymon Asia Capital
+        dates: 2008-07–2014-12
+      - title: Portfolio Manager
+        company: SHK Financial Group
+        dates: 2005-05–2007-10
+      - title: Portfolio Manager
+        company: GIC
+        dates: 1997-07–2005-01
+    source: coresignal
+
+  - id: '1649739'
+    name: Bhaargav Rengarajan
+    title: Co-Founder
+    company: SKIA
+    company_type: Food and Beverage
+    location: Singapore
+    headline: "Founder | Building in stealth | Ex-Google, Blinkit | early IB & PE"
+    about: >
+      Previously built and scaled consumer and payments businesses across startups
+      and Big Tech, with early training in investment banking and private equity.
+      Now building a functional food & beverage brand, currently in R&D in Singapore.
+    experience:
+      - title: Co-Founder
+        company: SKIA
+        dates: 2025-09–present
+      - title: Vice President Operations
+        company: Zenyum
+        dates: 2023-10–2024-09
+      - title: Angel Investor
+        company: (independent)
+        dates: 2021-08–2023-11
+    source: coresignal
+
+  # --- deliberately sparse (thin public presence) --------------------------- #
+  - id: '264253665'
+    name: Gerald Ho
+    title: Private Investor
+    company: Tiger Spirit Management
+    source: coresignal
+    notes: Sparse — only a role and firm are discoverable (family-office principal).
+
+  - id: '3921709'
+    name: Juuso Roinevirta
+    title: Co-founder & Chief Technology Officer
+    company: Based
+    source: coresignal
+    notes: Sparse — name, role and firm only; no further detail available.
