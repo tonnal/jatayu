@@ -33,12 +33,14 @@ sourcing:
   company_filters:
     # experience.company_industry — keep broad enough to catch AMs that classify
     # themselves variously, narrow enough to cut banks/insurers at the source.
+    # Narrowed to the genuine asset-management industries. "Financial Services"
+    # was removed: as a Coresignal catch-all it admits payments/crypto/brokers/
+    # corporate-services firms (SDAX, Finmo, Freight Investor, BBCIncorp) that are
+    # the wrong pool. These three are what an AM compliance seat actually lives in.
     industries_any:
       - "Investment Management"
-      - "Financial Services"
       - "Capital Markets"
       - "Venture Capital & Private Equity"
-      - "Financial Services Industry"
     # experience.company_size_employees_count — boutique / independent AM scale.
     # The bullseye is the SOLE compliance officer, which only exists at small
     # firms. 5..250 captures genuine boutiques while excluding bank-scale AM arms.

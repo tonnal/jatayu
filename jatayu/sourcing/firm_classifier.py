@@ -88,9 +88,10 @@ def classify_firm(
             return FirmClassification(key, ft.label, ft.tier, "name")
 
     for key, ft in taxonomy.types.items():
-        # Attribute path: only if the type actually constrains on attributes.
-        constrains = bool(ft.industries_any) or ft.employee_count is not None
-        if not constrains:
+        # Attribute path requires an INDUSTRY constraint. A type with only a size
+        # band (e.g. family_office, bank_am_arm) must match by NAME — otherwise it
+        # would tag every small/large firm regardless of what business it's in.
+        if not ft.industries_any:
             continue
         if _industry_hit(industry, ft) and _size_hit(employee_count, ft.employee_count):
             return FirmClassification(key, ft.label, ft.tier, "attributes")

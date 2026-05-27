@@ -27,8 +27,12 @@ def _experience_company_clause(cf: CompanyFilter) -> dict | None:
         must.append(
             {
                 "bool": {
+                    # match_phrase, NOT match: a plain `match` on company_industry
+                    # token-bleeds ("Financial Services" would match "Food and
+                    # Beverage Services" via the shared "Services" token). Phrase
+                    # matching requires the exact industry string.
                     "should": [
-                        {"match": {"experience.company_industry": ind}}
+                        {"match_phrase": {"experience.company_industry": ind}}
                         for ind in cf.industries_any
                     ],
                     "minimum_should_match": 1,
@@ -172,4 +176,9 @@ def build_search_query(sourcing: SourcingConfig, *, size: int = 100) -> dict:
     if must_not:
         bool_query["must_not"] = must_not
 
-    return {"size": size, "query": {"bool": bool_query}}
+    # NOTE: Coresignal's es_dsl endpoint rejects a top-level `size` in the body
+    # ("extra_forbidden"). One search returns a default page of IDs; we slice to
+    # the desired count after the call (see pipeline). `size` is kept in the
+    # signature for callers but intentionally not emitted into the request body.
+    _ = size
+    return {"query": {"bool": bool_query}}
