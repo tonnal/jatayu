@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, Fraunces } from "next/font/google";
 import "./globals.css";
+import PasswordGate from "../components/PasswordGate";
 
 // Refined grotesque for UI/body — characterful but enterprise-clean (not Inter).
 const hanken = Hanken_Grotesk({
@@ -25,7 +26,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${hanken.variable} ${fraunces.variable}`}>
-      <body className="min-h-screen bg-[var(--color-canvas)] text-[var(--color-ink)] antialiased">{children}</body>
+      <body className="min-h-screen bg-[var(--color-canvas)] text-[var(--color-ink)] antialiased">
+        <PasswordGate>{children}</PasswordGate>
+      </body>
     </html>
   );
 }
