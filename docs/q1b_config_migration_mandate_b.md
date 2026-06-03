@@ -6,6 +6,31 @@ Family Office)** with *no code changes* — only a new config (`configs/mandate_
 committed and validated through the identical pipeline) — and, honestly, where it
 strains.
 
+## Two paths to a working config — neither requires code
+
+There is a meaningful subtlety the brief asks about ("how would your tool handle
+the other mandate without code changes") that this doc should name up front:
+
+1. **LLM-generated path (the default).** The user pastes a mandate brief into the
+   home-page "Generate strategy" card (or hits `POST /api/generate`). `jatayu/
+   strategy.py` translates the brief into a complete `MandateConfig` —
+   industries, firm taxonomy, gates, sub-scores, weights, exclusions — and
+   writes it to `configs/generated.yaml`. The same engine then runs against
+   that config identically to a hand-written one. **No YAML editing required at
+   all.** This is how Mandate B *actually* lands in the product today.
+
+2. **Expert-tuned path (what this document shows).** A search professional
+   reads the LLM's first draft, identifies precision/recall trade-offs the
+   model didn't make well (e.g. "drop the `employee_count` cap entirely
+   because firm size is noise for SFO PMs"), and edits the YAML. The diff
+   below is that human refinement — the version we'd ship after one expert
+   iteration on top of the LLM output.
+
+The brief asks for an explicit diff, so this doc shows the expert-tuned
+version. But the architecturally honest answer to "how does the tool handle a
+new mandate" is **path 1: it generates the config itself.** Path 2 is the
+ceiling, not the floor.
+
 ---
 
 ## 1. Diff against the existing config
