@@ -241,9 +241,13 @@ _SHAPE_GUIDE = {
         "No follow-up ask. 60-100 words."
     ),
     "DIRECT": (
-        "SHAPE = DIRECT. Short. 30-55 words. State an honest observation about "
-        "their seat or firm type, then a one-line conditional open door. No "
-        "manufactured personalisation. No pitch language. No meeting ask."
+        "SHAPE = DIRECT. Short but not terse. 60-90 words. State one honest "
+        "observation about the recipient's seat or firm archetype, then ONE more "
+        "line of context that's true at the archetype level (the kind of hire "
+        "that comes up, why it's hard, what they'd actually want from a search "
+        "firm), then a one-line conditional open door. NO manufactured "
+        "personalisation. NO pitch language. NO meeting ask. The reader should "
+        "feel it was worth opening even though you know almost nothing about them."
     ),
 }
 
