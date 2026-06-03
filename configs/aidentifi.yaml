@@ -25,10 +25,12 @@ target_clients: >
   Founders, principals, COOs, and heads of talent at asset managers, single/multi
   family offices, private banks, PE/VC firms, and fintechs — anyone with a hard,
   senior, judgment-heavy hire and little time to fill it.
-sender_name: "the Aidentifi team"
-sender_role: "Partner, Aidentifi"
+sender_name: "Shashank"          # first-name sign-off; replace if you sign as someone else
+sender_firm_tag: "Aidentifi"     # optional line under the name; can be left empty
 voice: >
-  Concise, senior-to-senior, specific. No flattery, no buzzword soup, no "I hope
-  this finds you well". One concrete observation about their situation, one concrete
-  reason Aidentifi is relevant, one low-friction ask. The tone of a busy partner
-  who respects the reader's time.
+  How a busy senior partner actually writes — not how an "AI BD email" sounds.
+  Plain English. Contractions. A specific opening that earns the next sentence.
+  No flattery, no buzzword soup, no "AI-native", no "compare notes", no
+  "worth 20 minutes". Often the right move is a thought + an open door, no ask at
+  all. Sometimes a single question. The pitch, if it appears, is one line and
+  buried — never the spine of the note.

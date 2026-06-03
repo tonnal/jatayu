@@ -20,7 +20,16 @@ def _quoted_or(keywords: list[str]) -> str:
 
 
 def _experience_company_clause(cf: CompanyFilter) -> dict | None:
-    """Nested clause: 'held a role at a firm of THIS industry AND THIS size'."""
+    """Nested clause pinned to the CURRENT employer: 'is currently at a firm of
+    THIS industry AND THIS size'.
+
+    The nested filter is constrained to the active experience so that a candidate
+    whose CURRENT job is at a wrong-pool firm (payments, crypto, mining, bank) is
+    excluded even if they once held a role at a target-industry firm. Without
+    this pin, the nested match fired on any historical experience and flooded the
+    pull with currently-wrong-pool profiles. Null-tolerant: profiles where
+    active_experience is missing fall back to date_to being null/present.
+    """
     must: list[dict] = []
 
     if cf.industries_any:
@@ -75,6 +84,23 @@ def _experience_company_clause(cf: CompanyFilter) -> dict | None:
 
     if not must:
         return None
+
+    # Pin the nested match to the CURRENT employer so a past-only stint at a
+    # target-industry firm doesn't qualify a candidate whose current job is at
+    # a wrong-pool firm. Null-tolerant: also accept records where date_to is
+    # missing (data-quality fallback for profiles lacking active_experience).
+    must.insert(
+        0,
+        {
+            "bool": {
+                "should": [
+                    {"term": {"experience.active_experience": True}},
+                    {"bool": {"must_not": {"exists": {"field": "experience.date_to"}}}},
+                ],
+                "minimum_should_match": 1,
+            }
+        },
+    )
 
     return {
         "nested": {

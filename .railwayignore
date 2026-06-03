@@ -1,0 +1,23 @@
+# Used when deploying the API service from this directory.
+# The web service is deployed separately from /web (its own .railwayignore not needed).
+
+web/
+node_modules/
+.next/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Local artefacts — big and not needed in the deploy upload.
+data/cache/
+data/output/
+*.xlsx
+*.csv
+
+# Local env + git noise
+.env
+.env.*
+.git/
+.DS_Store

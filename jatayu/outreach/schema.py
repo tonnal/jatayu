@@ -76,8 +76,9 @@ class AidentifiProfile(BaseModel):
     proof_points: list[str] = Field(default_factory=list)
     target_clients: str = ""
     sender_name: str = ""
-    sender_role: str = ""
-    voice: str = ""  # how a senior partner writes (register/tone)
+    sender_role: str = ""             # legacy; sender_firm_tag is preferred
+    sender_firm_tag: str = ""         # short tag rendered below the first name (often the firm)
+    voice: str = ""                   # how a senior partner writes (register/tone)
 
 
 class OutreachConfig(BaseModel):

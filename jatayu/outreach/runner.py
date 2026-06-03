@@ -16,10 +16,12 @@ from .schema import OutreachConfig
 
 
 def _draft_to_md(d: OutreachDraft) -> str:
+    retry_tag = f"  ·  *cliche-retries:* **{d.cliche_retries}**" if d.cliche_retries else ""
     lines = [
         f"# Outreach — {d.recipient_name or d.recipient_id}  ({d.recipient_id})",
-        f"*tier:* **{d.tier}**  ·  *channel:* **{d.channel}**  ·  "
-        f"*confidence:* **{d.confidence}**  ·  *review required:* **{d.review_required}**",
+        f"*tier:* **{d.tier}**  ·  *shape:* **{d.shape}**  ·  *channel:* **{d.channel}**  ·  "
+        f"*confidence:* **{d.confidence}**  ·  *review required:* **{d.review_required}**"
+        + retry_tag,
         "",
     ]
     if d.subject:
@@ -30,7 +32,7 @@ def _draft_to_md(d: OutreachDraft) -> str:
         lines += [f"- {u}" for u in d.uncertainty_flags]
         lines.append("")
     if d.ungrounded_claims:
-        lines.append("**⚠️ Ungrounded claims caught by validator (must fix before send):**")
+        lines.append("**Ungrounded claims caught by validator (must fix before send):**")
         lines += [f"- {c}" for c in d.ungrounded_claims]
         lines.append("")
     lines.append("**Claim provenance:**")
@@ -53,8 +55,8 @@ def run_all(
     out.mkdir(parents=True, exist_ok=True)
 
     drafts: list[OutreachDraft] = []
-    for r in cfg.recipients:
-        d = gen.generate(r)
+    for i, r in enumerate(cfg.recipients):
+        d = gen.generate(r, batch_index=i)
         drafts.append(d)
         (out / f"{r.id}.md").write_text(_draft_to_md(d), encoding="utf-8")
 

@@ -55,6 +55,16 @@ observable signal that stands in for it (the "signal map"), specific to this bri
 - GATES ARE INDEPENDENT THRESHOLDS. A candidate who fails a hard gate is a non-fit \
 regardless of other strengths — don't average a fatal flaw away. Sub-score weights \
 must sum to 1.0.
+- NEVER EMIT AMBIGUOUS TITLE ABBREVIATIONS. Acronyms like "CCO", "CRO", "COO", \
+"CSO", "CTO", "VP", "MD" have multiple common expansions across functions \
+(e.g. "CCO" = Chief Compliance Officer OR Chief Commercial Officer; "CRO" = \
+Chief Risk Officer OR Chief Revenue Officer). An abbreviation as a title keyword \
+floods the pull with the wrong meaning. RULE: always emit the FULL PHRASE \
+("Chief Compliance Officer"), never the bare acronym. When the target full \
+phrase has a likely wrong-meaning expansion in adjacent functions, ALSO add \
+that wrong expansion to exclude_title_keywords (e.g. for a compliance mandate, \
+exclude "Chief Commercial Officer"). The same applies to other ambiguous \
+short forms — when in doubt, exclude the wrong meaning.
 - BE SPARING WITH HARD GATES, AND DERIVE THEM FROM THIS BRIEF'S MUST-HAVES. A hard \
 gate is allowed ONLY for the few conditions that are (a) categorically \
 disqualifying for THIS mandate AND (b) reliably observable on a profile. \

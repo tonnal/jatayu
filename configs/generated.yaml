@@ -1,14 +1,37 @@
 mandate:
   id: generated
-  name: "Sole Compliance Officer \u2013 Singapore Asset Manager (MAS-licensed, AI-distribution)"
-  description: 'Singapore-headquartered, MAS-licensed asset manager (~SGD 400-700M
-    proprietary AUM plus larger third-party AUM distributed to Accredited Investors
-    via open-architecture wrappers). Recently acquired by a global alternatives manager;
-    rebuilding institutional infrastructure after a retail/IFA heritage. The hire
-    is the SOLE compliance officer: AI client onboarding, MAS regulatory management,
-    fund governance, trade/risk oversight, Board reporting. No team beneath them.
-    Commercially oriented, growth-mode, front-office partner. Singapore-based, 8-15
-    years compliance experience.'
+  name: "Sole Compliance Officer / Head of Compliance \u2014 SG MAS CMS-licensed Asset\
+    \ Manager (AI segment)"
+  description: "Client profile (anonymised): Singapore-headquartered, MAS-licensed\
+    \ asset manager. Approximately\nSGD 400-700M proprietary AUM, with materially\
+    \ larger third-party AUM distributed to Accredited\nInvestor clients via open-architecture\
+    \ wrappers (private credit, private equity, hedge funds from\nglobal GPs). Recently\
+    \ acquired by a top-tier global alternatives manager and currently rebuilding\n\
+    institutional infrastructure following a transition from retail/IFA-linked heritage.\
+    \ Holds a Capital\nMarkets Services license under MAS.\nThe role: Sole compliance\
+    \ officer for the entity. Full ownership: AI client onboarding compliance,\nMAS\
+    \ regulatory management, fund governance, trade and risk oversight, Board reporting.\
+    \ No team\nbeneath the hire. Reports to senior management and Board. Transformational\
+    \ seat, not steady-state\nBAU.\nProfile orientation: Singapore-based candidates\
+    \ only. 8-15 years compliance experience.\nCommercially oriented; the firm is\
+    \ in growth mode and the role requires partnership with the front\noffice.\nWhat\
+    \ good likely looks like: Sole or near-sole compliance experience at an independent\
+    \ SG asset\nmanager; direct AI onboarding under own license (not retail/IFA only);\
+    \ fluency with MAS CMS\nlicensing categories and the AI/Retail distinction; exposure\
+    \ to open-architecture / third-party fund\ndistribution; VCC structure familiarity.\n\
+    What weak likely looks like: Pure banking or capital markets compliance with no\
+    \ AM exposure; Big 4\nadvisory compliance only; MAS regulators with no industry\
+    \ side; retail-only IFA compliance with no AI\nonboarding.\nThis guidance is deliberately\
+    \ partial. Building the inference logic that maps these textures onto\nobservable\
+    \ Coresignal data is the assignment.\nResearch signposts: MAS website on Capital\
+    \ Markets Services License categories; the Accredited\nInvestor vs Retail distinction;\
+    \ VCC structure; recent MAS enforcement actions on AM licensees. For\nstudying\
+    \ the shape of compliance functions at independent SG AMs (study, do not source\
+    \ from):\nGordian Capital, Endowus, iFAST's CMS arm, Tikehau Singapore.\nMandate\
+    \ note: The universe is narrow but easy to over-include. Title-matching \"Compliance\
+    \ +\nSingapore + Asset Management\" returns hundreds of profiles where most are\
+    \ wrong fits. Signal lives\nin adjacent attributes \u2014 firm scale, license\
+    \ type, compliance team headcount, AM business model \u2014\nnot in the role title."
 sourcing:
   location_countries:
   - Singapore
@@ -17,59 +40,79 @@ sourcing:
     industries_any:
     - Investment Management
     - Capital Markets
-    - Venture Capital & Private Equity
-    - Financial Services
+    - Venture Capital and Private Equity Principals
     employee_count:
-      gte: 15
-      lte: 400
+      gte: 10
+      lte: 300
     company_keywords_any: []
   title_keywords_any:
   - Compliance Officer
   - Head of Compliance
   - Chief Compliance Officer
-  - Compliance Manager
   - Compliance Director
-  - MLRO
-  - Money Laundering Reporting Officer
+  - Compliance Manager
+  - Compliance Lead
   - Regulatory Compliance
-  - Compliance & Risk
   skills_any:
   - MAS
+  - Capital Markets Services License
+  - CMS License
   - Securities and Futures Act
   - SFA
   - Accredited Investor
   - Fund Management
   - Asset Management Compliance
-  - AML/CFT
-  - Regulatory Compliance
-  - Trade Surveillance
-  - Fund Governance
   - VCC
   - Variable Capital Company
-  - Private Banking Compliance
-  - Investment Compliance
+  - AML
+  - KYC
+  - Private Funds
+  - Hedge Fund Compliance
+  - Private Equity Compliance
+  - Fund Governance
   exclusions:
     title_keywords_none:
     - Intern
-    - Analyst I
-    - Junior
-    - Assistant Compliance
-    - KYC Analyst
+    - Analyst
+    - Associate
+    - Assistant
     - AML Analyst
-    - Sanctions Analyst
+    - KYC Analyst
     - Trainee
+    - Chief Commercial Officer
+    - Commercial Officer
     company_keywords_none:
-    - Payments
-    - PayTech
-    - Crypto
-    - Digital Asset Exchange
-    - Remittance
-    - Money Changer
-    - CFD
-    - Margin FX
-    - Insurance Broker
-    - Corporate Services
-    - Company Secretarial
+    - Gordian Capital
+    - Endowus
+    - iFAST
+    - Tikehau
+    - Deloitte
+    - Ernst & Young
+    - EY
+    - KPMG
+    - PricewaterhouseCoopers
+    - PwC
+    - Monetary Authority of Singapore
+    - DBS Bank
+    - Standard Chartered Bank
+    - Citibank
+    - UBS
+    - Credit Suisse
+    - HSBC
+    - OCBC
+    - Prudential
+    - AIA
+    - Manulife
+    - SUNRATE
+    - BigONE
+    - FrontM
+    - Rio Tinto
+    - E.sun
+    - Binance
+    - Coinbase
+    - Kraken
+    - OKX
+    - Bybit
     industries_none: []
   dev:
     sample_size: 10
@@ -113,13 +156,12 @@ firm_taxonomy:
       industries_any: []
       employee_count: null
       name_anchors:
-      - Retail-only Financial Advisers / IFAs (MAS FA licence, ILP/unit-trust distribution
-        to retail)
-      - Payments Services Act licensees (payments, e-money, remittance)
-      - Crypto/Digital Payment Token exchanges and DPT service providers
-      - Retail brokerage / CFD / margin FX compliance
-      - Corporate-services / company-secretarial compliance
-      - Pure AML analysts with no investment-management context
+      - Pure retail IFA / insurance FA compliance
+      - Bulge-bracket bank wholesale/markets compliance with no AM seat
+      - Big-4 regulatory advisory with no in-house AM tenure
+      - Career regulators with no industry seat
+      - Insurance / reinsurance compliance
+      - Payments / crypto exchange compliance (unless they did AM compliance later)
       name_keywords_any: []
     core_named:
       label: Core target firms
@@ -127,12 +169,15 @@ firm_taxonomy:
       industries_any: []
       employee_count: null
       name_anchors:
-      - "Singapore boutique LFMCs / RFMCs (SGD 200M\u20132B AUM) distributing to Accredited\
-        \ Investors"
-      - External Asset Managers (EAMs) / Multi-Family Offices licensed by MAS
-      - Singapore-domiciled hedge funds & private credit managers serving AI/institutional
-        clients
-      - Boutique private-equity / alternatives managers with MAS CMS licence
+      - Independent SG-headquartered MAS CMS-licensed asset managers, ~15-150 staff,
+        serving Accredited Investors (e.g. Gordian Capital, Lumen Capital, Avanda,
+        Quantedge, Asia Genesis, Dymon Asia, Tsao Family Office AM arms, ADM Capital
+        SG, Silverdale, New Silk Road, APS Asset Management)
+      - SG arms of mid-size global alternatives / private-markets managers with a
+        CMS license and lean compliance (e.g. Tikehau SG, Muzinich SG, Pierfront,
+        Pinpoint, Triata)
+      - Open-architecture / multi-manager platforms distributing third-party private
+        funds to AIs (e.g. iFAST CMS arm, Endowus, Stashaway-AI line, ICHAM, Lumen)
       name_keywords_any: []
     core_attr:
       label: Core by industry+scale
@@ -140,11 +185,10 @@ firm_taxonomy:
       industries_any:
       - Investment Management
       - Capital Markets
-      - Venture Capital & Private Equity
-      - Financial Services
+      - Venture Capital and Private Equity Principals
       employee_count:
         gte: null
-        lte: 400
+        lte: 300
       name_anchors: []
       name_keywords_any: []
     adjacent_named:
@@ -153,14 +197,14 @@ firm_taxonomy:
       industries_any: []
       employee_count: null
       name_anchors:
-      - "Wealth/Private Banking compliance desks (UBS, Julius Baer, LGT, Pictet, BNP\
-        \ WM, Lombard Odier) \u2013 AI-onboarding muscle, may lack fund-manager scope"
-      - Mid-size global asset managers' Singapore compliance hubs (where the SG officer
-        ran a near-solo remit)
-      - Big4 / law-firm regulatory consultants with strong asset-management client
-        roster (KPMG, PwC, EY, Deloitte FS Risk; A&G, Allen & Overy regulatory)
-      - Fund administrators / trustees compliance leads (Apex, IQ-EQ, Trident, Vistra)
-        with VCC exposure
+      - Single/multi family offices in SG with CMS or RFMC license running external
+        manager allocations
+      - Private banking AI-segment compliance officers with explicit fund-distribution
+        remit (boutique PB only)
+      - Fund administrators / VCC service providers with strong AM-side regulatory
+        advisory (only if they've since moved in-house)
+      - Hedge fund / PE GPs with SG CMS sub-scale operations needing a sole compliance
+        person
       name_keywords_any: []
     large_attr:
       label: Larger firm in target industry
@@ -168,10 +212,9 @@ firm_taxonomy:
       industries_any:
       - Investment Management
       - Capital Markets
-      - Venture Capital & Private Equity
-      - Financial Services
+      - Venture Capital and Private Equity Principals
       employee_count:
-        gte: 401
+        gte: 301
         lte: null
       name_anchors: []
       name_keywords_any: []
@@ -181,225 +224,220 @@ firm_taxonomy:
       industries_any: []
       employee_count: null
       name_anchors:
-      - Ex-MAS officers (Capital Markets / Investment Products / AML divisions) now
-        2-5 years into industry
-      - Hong Kong SFC Type 4/9 compliance officers willing/able to relocate and convert
-        to MAS regime
-      - Insurance-linked investment platform compliance officers with AI distribution
-        exposure
+      - Wealth managers transitioning from retail to AI segment with demonstrated
+        AI onboarding build
+      - Compliance leads at SG fintech AMs (robo-advisor CMS holders) who built AI
+        flows
+      - Recent ex-MAS officers (CIS/IID division) who then did 3+ years in an AM seat
       name_keywords_any: []
 scoring:
   model: claude-sonnet-4-6
   gates:
-  - id: G1_geo
-    description: Currently based in Singapore (or has a 5+ year recent track record
-      in Singapore with current location Singapore). Remote/overseas-only candidates
-      fail.
+  - id: G1_location_sg
+    description: Currently based in Singapore.
     hard: true
-  - id: G2_buyside_compliance
-    description: Has held a compliance role inside an MAS-licensed asset manager,
-      EAM, hedge fund, PE firm, or private-bank wealth/investment compliance desk.
-      Pure retail-FA, payments, crypto-exchange, or brokerage-only compliance fails.
+  - id: G2_am_compliance_experience
+    description: Has held an in-house compliance role at a buy-side asset manager
+      / fund manager (not solely bank, Big-4 advisory, regulator, or retail IFA).
     hard: true
   - id: G3_experience_band
-    description: 8-15 years total compliance experience; not a junior analyst, not
-      a 25-year career CCO seeking a team-building remit they won't get here.
+    description: 8-15 years total compliance experience (allow 7 floor / 17 ceiling
+      for exceptional fit).
     hard: true
   sub_scores:
-  - id: S1_mas_buyside_depth
-    label: MAS + buy-side compliance depth
+  - id: S1_independent_am_scope
+    label: Sole/near-sole compliance ownership at an independent SG AM
     weight: 0.22
-    guidance: Years and recency inside MAS-licensed CMS/LFMC/RFMC or private-bank
-      wealth compliance. Reward multiple buy-side employers; penalise single-firm-only
-      careers.
-  - id: S2_ai_onboarding
-    label: Accredited Investor onboarding & SFA classification
-    weight: 0.18
-    guidance: "Direct evidence of running AI/HNW onboarding at scale \u2013 SFA s.4A\
-      \ classification, source-of-wealth, ongoing review. Private-bank wealth-compliance\
-      \ and EAM backgrounds score highest."
-  - id: S3_sole_scope_fit
-    label: Sole-officer scope readiness
-    weight: 0.15
-    guidance: Has personally owned the compliance monitoring programme end-to-end
-      at a firm of 20-150 people. Penalise candidates who only managed within a large
-      team or have never presented to a Board.
-  - id: S4_fund_governance
-    label: Fund governance & wrapper familiarity
+    guidance: 'Top marks: only compliance officer (or 1-of-2) at an SG MAS CMS AM
+      with 15-150 staff. Penalise large-team compliance analysts at global AMs and
+      ''Head of Compliance APAC'' at bulge brackets.'
+  - id: S2_ai_onboarding_under_own_license
+    label: Direct AI onboarding under own CMS license
+    weight: 0.2
+    guidance: "Evidence of running AI eligibility, opt-in, declarations, and onboarding\
+      \ flows at a licensee \u2014 not as a distributor of someone else's product.\
+      \ Retail/IFA-only onboarding scores low."
+  - id: S3_mas_cms_fluency
+    label: MAS CMS regime + SFA fluency
+    weight: 0.13
+    guidance: Profile evidence (skills, courses, conference talks, regulator-facing
+      reps) of CMS licensing conditions, AI/Retail distinction, FAA touchpoints. Penalise
+      career bankers with generic 'MAS compliance' tagline.
+  - id: S4_open_architecture_third_party
+    label: Open-architecture / third-party PC-PE-HF wrapper exposure
     weight: 0.12
-    guidance: VCC, Cayman/Lux feeders, fund-board reporting, administrator/trustee
-      oversight, offering-doc review. Open-architecture / sub-advisory wrappers score
-      extra.
-  - id: S5_trade_risk_oversight
-    label: Trade surveillance & investment-risk oversight
-    weight: 0.1
-    guidance: Hands-on with best execution, PA dealing, investment guideline monitoring,
-      conflicts. Tooling references (Bloomberg, Charles River, SimCorp, MCO, ACA)
-      are positive.
-  - id: S6_commercial_posture
-    label: Commercial / front-office partnership
-    weight: 0.1
-    guidance: Evidence of enabling product launches, distribution growth, or new-client
-      onboarding rather than blocking. Look for new-product committee, distribution
-      support, or 1LOD rotations.
-  - id: S7_buildout_resilience
-    label: Post-acquisition / institutional build-out resilience
+    guidance: Worked at a multi-manager / wrapper platform or AM distributing external
+      GP funds to AIs. Fund selection DD compliance reps are a strong tell.
+  - id: S5_vcc_and_fund_governance
+    label: VCC and fund governance reps
     weight: 0.08
-    guidance: Has lived through M&A integration, licence variation, or a retail-to-institutional
-      pivot and stayed. Penalise serial 18-month tenures during integration phases.
-  - id: S8_credentials_network
-    label: Credentials, regulator network & stability
-    weight: 0.05
-    guidance: ICA / IBF-STS / CAMS / law qualification; ex-MAS or known to MAS supervisors
-      positively; tenure pattern shows 3+ year stints.
+    guidance: Concrete VCC umbrella/sub-fund or SG-domiciled fund governance work.
+      Reward sub-fund board reporting reps.
+  - id: S6_commercial_orientation
+    label: Commercial / front-office partnership posture
+    weight: 0.1
+    guidance: "Language and trajectory suggest enabler not blocker \u2014 moved from\
+      \ big-bank to boutique AM, sat with investment team, supported product launches.\
+      \ Penalise pure surveillance/monitoring career arcs."
+  - id: S7_transformation_buildout
+    label: Build / transformation track record
+    weight: 0.08
+    guidance: "Evidence of building a compliance framework from low base, navigating\
+      \ M&A integration, or scaling a CMS license \u2014 not steady-state BAU at a\
+      \ mature institution."
+  - id: S8_sg_stability_and_seniority_fit
+    label: SG career continuity and 8-15y seniority sweet spot
+    weight: 0.07
+    guidance: 5+ years continuous SG tenure; experience band lands cleanly in 8-15y;
+      avoid both too-junior (<8y) and over-senior (>17y, will be expensive/over-titled
+      for sole-officer seat).
   shortlist_threshold: 35.0
 spec:
   must_haves:
-  - Based in Singapore (work authorization assumed; local MAS regime fluency non-negotiable)
-  - "8-15 years compliance experience, with the bulk inside an MAS-licensed asset/fund\
-    \ manager (CMS licensee \u2013 LFMC/RFMC) or a private bank/EAM serving Accredited\
-    \ Investors"
-  - Hands-on Accredited Investor (AI) onboarding & client classification under the
-    SFA, including AML/CFT, KYC, source-of-wealth, and ongoing suitability
-  - 'Direct line ownership of MAS regulatory interface: licence conditions, Form 1/Form
-    22/Annex reporting, MAS Notices (SFA04-N12, FAA-N06, N14, N16), inspections and
-    queries'
-  - "Fund governance experience \u2013 working with fund boards, administrators, trustees,\
-    \ custodians; reviewing offering docs, side letters, NAV/valuation oversight"
-  - Trade surveillance & investment-risk oversight in a live portfolio environment
-    (best execution, personal account dealing, conflicts, cross-trades)
-  - "Comfortable as a sole/solo compliance function \u2013 has personally drafted\
-    \ policies, run the compliance monitoring programme, and presented to a Board\
-    \ / Audit & Risk Committee"
-  - "Commercially-minded posture \u2013 evidence of partnering with front office on\
-    \ product launches and distribution, not a pure gatekeeper"
+  - Singapore-based with right to work; stable SG career footprint
+  - 8-15 years compliance experience, of which a clear majority in-house at a buy-side
+    asset/fund manager
+  - Hands-on ownership of MAS CMS-licensed entity obligations (licensing conditions,
+    returns, breach reporting, Form 1/22A/23A familiarity)
+  - Direct experience onboarding Accredited Investor clients under the firm's own
+    license (not retail/IFA distribution)
+  - "Comfort as sole or near-sole compliance owner (no team beneath) \u2014 has operated\
+    \ at <150-person AM"
+  - Board / senior-management reporting reps
+  - "Commercial posture \u2014 track record partnering with portfolio managers and\
+    \ distribution, not gatekeeper-only"
   nice_to_haves:
-  - Exposure to VCC (Variable Capital Company) structures and/or Cayman/Lux feeder
-    wrappers distributed into Singapore AIs
-  - Open-architecture / third-party fund distribution experience (platform, feeder,
-    sub-advisory, or wrapper structures)
-  - "Post-acquisition integration experience \u2013 building institutional frameworks\
-    \ inside a firm transitioning from retail/IFA to institutional"
-  - Familiarity with a global alternatives parent's group compliance reporting cadence
-  - ICA / IBF-STS / CAMS / law degree; ex-MAS, ex-Big4 regulatory consulting, or ex-private
-    bank Wealth Compliance background
-  - "Has scaled headcount before (even if currently solo) \u2013 signals readiness\
-    \ to build a team as AUM grows"
+  - Open-architecture / third-party fund distribution experience (PC, PE, HF wrappers)
+  - VCC structuring and sub-fund governance experience
+  - Experience through an M&A / parent-integration transition
+  - Familiarity with global alternatives GP operating standards (post-acquisition
+    fit)
+  - Trade surveillance and risk oversight exposure beyond pure regulatory compliance
+  - Prior build-out of a compliance framework from a low base (transformation, not
+    BAU)
+  - MAS Representative Notification / CACS certifications
 criteria_evidence:
-- want: MAS regulatory fluency
-  proxy: Tenure at an MAS-licensed CMS/LFMC/RFMC or local private bank, with title
-    containing Compliance/MLRO and Singapore location across multiple roles
+- want: Sole/near-sole compliance ownership at an independent SG AM
+  proxy: Current/prior title is Head of Compliance / Compliance Officer / CCO at an
+    SG-licensed AM with <100 employees and no visible compliance team beneath them
+    on LinkedIn
   signal: high
-- want: AI (Accredited Investor) onboarding depth
-  proxy: Compliance role at a Singapore EAM, private bank wealth desk, or boutique
-    LFMC whose distribution is explicitly to AIs/HNW (not retail funds)
+- want: Direct AI onboarding under own CMS license
+  proxy: Tenure at an MAS CMS-licensed AM serving Accredited Investors (not retail/IFA-distributed
+    funds); profile mentions AI onboarding, KYC for AIs, or private fund distribution
   signal: high
-- want: Sole-compliance-officer scope readiness
-  proxy: Current/prior employer headcount 15-120; candidate is the named Compliance
-    Officer / Head of Compliance with no sub-team listed
+- want: MAS CMS license fluency and AI/Retail distinction
+  proxy: Profile/skills mention CMS license, MAS SFA, FAA, Notice SFA 04-N02, AI onboarding,
+    Section 4A SFA
   signal: high
-- want: Fund governance
-  proxy: Mentions of fund board reporting, offering memorandum, fund administrator/trustee
-    oversight, NAV oversight, VCC, Cayman/Lux funds
+- want: Open-architecture / third-party fund distribution exposure
+  proxy: Experience at multi-manager/feeder/wrapper platforms, fund-of-funds, or AM
+    with distribution of GP funds (private credit / PE / hedge)
   signal: medium
-- want: Trade & investment risk oversight
-  proxy: Skills/role text referencing trade surveillance, best execution, PA dealing,
-    investment guideline monitoring, Bloomberg/Charles River/SimCorp
+- want: VCC structure familiarity
+  proxy: Mentions VCC, Variable Capital Company, sub-fund governance, or worked at
+    an AM that launched VCCs post-2020
   signal: medium
-- want: Commercial / front-office partnership
-  proxy: Has sat on new-product committees, supported sales/distribution launches,
-    or moved between 1LOD and 2LOD; language like 'business enablement', 'product
-    approval', 'distribution support'
+- want: Commercial orientation / front-office partnership
+  proxy: Profile language emphasises 'business enablement', 'partnering with investment
+    team', growth-stage AM tenure, or move from large-bank compliance into boutique
+    AM
   signal: medium
-- want: Open-architecture / wrapper familiarity
-  proxy: Prior employer is a platform/feeder/multi-manager/EAM, or candidate references
-    sub-advisory, white-label, or wrapper distribution
+- want: Transformation / build-out capability
+  proxy: Joined an AM at sub-30 headcount and stayed through scale-up; led framework/policy
+    build, not BAU monitoring at a large institution
   signal: medium
-- want: Post-acquisition build-out resilience
-  proxy: Worked through an M&A integration, licence variation, or 'retail-to-institutional'
-    pivot at a previous employer
-  signal: medium
-- want: "Wrong pool \u2013 retail/IFA-only"
-  proxy: Entire career at MAS-licensed Financial Advisers (FAs) selling ILPs/unit
-    trusts to retail; no AI/fund manager exposure
+- want: Singapore-based and stable
+  proxy: Current location Singapore for 5+ years; PR/citizen signals (career continuity
+    in SG); not a recent expat parachute
+  signal: high
+- want: NOT pure retail/IFA heritage
+  proxy: Compliance career at IFA platforms, insurance-linked product distributors,
+    or retail wealth managers with no AI fund work
   signal: negative
-- want: "Wrong pool \u2013 payments/crypto/brokerage"
-  proxy: "Compliance career at payments institutions, crypto exchanges, retail brokerages,\
-    \ or remittance \u2013 different MAS regime, no fund/AI muscle"
+- want: NOT pure banking capital-markets compliance
+  proxy: Career entirely at GS/JPM/UBS/DBS/StanChart capital-markets or wholesale-banking
+    compliance with no AM seat
   signal: negative
-- want: "Wrong pool \u2013 mega-bank 2LOD specialist"
-  proxy: Career exclusively inside a tier-1 bank compliance silo (e.g. surveillance-only,
-    or policy-only) with no end-to-end ownership
+- want: NOT Big-4 advisory only
+  proxy: Career path Deloitte/EY/KPMG/PwC regulatory advisory with no in-house AM
+    tenure
+  signal: negative
+- want: NOT ex-MAS only
+  proxy: Entire career at MAS or other regulators with no buy-side industry seat
   signal: negative
 market_map:
-  pool_estimate: '~250-400 Singapore-based compliance professionals fit the core profile
-    (MAS-licensed asset manager / EAM / private-bank wealth compliance, 8-15 yrs,
-    sole-or-near-sole scope). Realistic prospect long-list: 120-180 after geography
-    + seniority + firm-type filters.'
+  pool_estimate: ~120-200 plausible in-house AM compliance professionals in Singapore;
+    realistic target shortlist universe ~40-70 after AI-onboarding and scale filters;
+    ~15-25 truly on-point.
   target_companies:
     core:
-    - "Singapore boutique LFMCs / RFMCs (SGD 200M\u20132B AUM) distributing to Accredited\
-      \ Investors"
-    - External Asset Managers (EAMs) / Multi-Family Offices licensed by MAS
-    - Singapore-domiciled hedge funds & private credit managers serving AI/institutional
-      clients
-    - Boutique private-equity / alternatives managers with MAS CMS licence
+    - Independent SG-headquartered MAS CMS-licensed asset managers, ~15-150 staff,
+      serving Accredited Investors (e.g. Gordian Capital, Lumen Capital, Avanda, Quantedge,
+      Asia Genesis, Dymon Asia, Tsao Family Office AM arms, ADM Capital SG, Silverdale,
+      New Silk Road, APS Asset Management)
+    - SG arms of mid-size global alternatives / private-markets managers with a CMS
+      license and lean compliance (e.g. Tikehau SG, Muzinich SG, Pierfront, Pinpoint,
+      Triata)
+    - Open-architecture / multi-manager platforms distributing third-party private
+      funds to AIs (e.g. iFAST CMS arm, Endowus, Stashaway-AI line, ICHAM, Lumen)
     adjacent:
-    - "Wealth/Private Banking compliance desks (UBS, Julius Baer, LGT, Pictet, BNP\
-      \ WM, Lombard Odier) \u2013 AI-onboarding muscle, may lack fund-manager scope"
-    - Mid-size global asset managers' Singapore compliance hubs (where the SG officer
-      ran a near-solo remit)
-    - Big4 / law-firm regulatory consultants with strong asset-management client roster
-      (KPMG, PwC, EY, Deloitte FS Risk; A&G, Allen & Overy regulatory)
-    - Fund administrators / trustees compliance leads (Apex, IQ-EQ, Trident, Vistra)
-      with VCC exposure
+    - Single/multi family offices in SG with CMS or RFMC license running external
+      manager allocations
+    - Private banking AI-segment compliance officers with explicit fund-distribution
+      remit (boutique PB only)
+    - Fund administrators / VCC service providers with strong AM-side regulatory advisory
+      (only if they've since moved in-house)
+    - Hedge fund / PE GPs with SG CMS sub-scale operations needing a sole compliance
+      person
     stretch:
-    - Ex-MAS officers (Capital Markets / Investment Products / AML divisions) now
-      2-5 years into industry
-    - Hong Kong SFC Type 4/9 compliance officers willing/able to relocate and convert
-      to MAS regime
-    - Insurance-linked investment platform compliance officers with AI distribution
-      exposure
+    - Wealth managers transitioning from retail to AI segment with demonstrated AI
+      onboarding build
+    - Compliance leads at SG fintech AMs (robo-advisor CMS holders) who built AI flows
+    - Recent ex-MAS officers (CIS/IID division) who then did 3+ years in an AM seat
     excluded:
-    - Retail-only Financial Advisers / IFAs (MAS FA licence, ILP/unit-trust distribution
-      to retail)
-    - Payments Services Act licensees (payments, e-money, remittance)
-    - Crypto/Digital Payment Token exchanges and DPT service providers
-    - Retail brokerage / CFD / margin FX compliance
-    - Corporate-services / company-secretarial compliance
-    - Pure AML analysts with no investment-management context
+    - Pure retail IFA / insurance FA compliance
+    - Bulge-bracket bank wholesale/markets compliance with no AM seat
+    - Big-4 regulatory advisory with no in-house AM tenure
+    - Career regulators with no industry seat
+    - Insurance / reinsurance compliance
+    - Payments / crypto exchange compliance (unless they did AM compliance later)
 off_limits:
-- Current employees of the acquiring global alternatives parent (group conflict)
-- "Compliance staff at firms the client distributes through or sub-advises (channel\
-  \ conflict \u2013 to be confirmed with client)"
-- Direct hires from named MAS supervisory team currently covering the licensee (cooling-off
-  / perception risk)
+- Current employees of the acquiring top-tier global alternatives parent (conflict)
+- 'Named study-only firms: Gordian Capital, Endowus, iFAST CMS arm, Tikehau Singapore
+  (study the shape, do not source from)'
+- Direct competitors under any existing no-poach if disclosed by client (flag for
+  confirmation)
 negative_heuristics:
-- id: N1
-  label: "Mega-bank silo specialist \u2013 impressive bank, but only ran surveillance\
-    \ OR only ran policy; never owned end-to-end and would drown as sole officer"
+- id: N1_ifa_retail_heritage
+  label: Long IFA / retail wealth compliance career with 'asset management' in title
+    but no AI/CMS fund work
   enabled: true
-- id: N2
-  label: "Retail/IFA lifer \u2013 MAS FA licence world, ILP and unit-trust sales compliance\
-    \ to retail; no AI/fund-manager muscle despite Singapore + 'Compliance' title"
+- id: N2_bank_compliance_cosplay
+  label: Bulge-bracket bank compliance officer with 'covered asset management desk'
+    but never sat inside an AM
   enabled: true
-- id: N3
-  label: "Payments/crypto compliance with strong MAS branding \u2013 fluent in PSA/DPT\
-    \ regime but not SFA/CMS; wrong regulator chapter"
+- id: N3_big4_advisory
+  label: "Big-4 regulatory/FS advisory manager-director with no in-house seat \u2014\
+    \ knows the rules, never owned them"
   enabled: true
-- id: N4
-  label: "Big4 regulatory consultant who never sat in 2LOD \u2013 advisory polish,\
-    \ no live MAS inspection or Board-reporting scar tissue"
+- id: N4_ex_mas_only
+  label: "Career MAS officer with no buy-side seat \u2014 policy fluency, no operating\
+    \ reps"
   enabled: true
-- id: N5
-  label: "Title-inflated 'Head of Compliance' at a 5-person shell \u2013 sole-by-default,\
-    \ not sole-by-design; no real fund-governance or trade-oversight reps"
+- id: N5_large_am_specialist
+  label: "Compliance analyst/manager at BlackRock/Fidelity/Schroders SG \u2014 one\
+    \ of 10+ in compliance team, never sole owner"
   enabled: true
-- id: N6
-  label: "Career gatekeeper with no commercial posture \u2013 will clash with the\
-    \ growth-mode, front-office-partner brief"
+- id: N6_fund_admin_lifer
+  label: "Career fund administrator (Apex, Citco, IQ-EQ) compliance \u2014 service-provider\
+    \ lens, not licensee accountability"
   enabled: true
-- id: N7
-  label: "Recently-acquired-firm refugee \u2013 just lived through an integration\
-    \ and is leaving precisely because they don't want to do it again"
+- id: N7_title_inflation_boutique
+  label: "'Head of Compliance' at a 3-person family office shell \u2014 title matches\
+    \ but scope/transferability is thin"
+  enabled: true
+- id: N8_crypto_only
+  label: "DPT/crypto compliance under PSA only \u2014 wrong regulatory regime for\
+    \ CMS AI fund distribution"
   enabled: true

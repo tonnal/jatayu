@@ -8,6 +8,8 @@ score -> review/override -> outreach.
 
 from __future__ import annotations
 
+import os
+
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,9 +22,16 @@ from . import service
 
 load_dotenv()
 app = FastAPI(title="Jatayu API", version="0.1")
+
+# CORS: localhost dev defaults + any origins passed via CORS_ORIGINS (comma-separated)
+# so the Railway web service URL can hit us without us hard-coding it here.
+_extra_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
+_allow_all = os.environ.get("CORS_ALLOW_ALL", "").lower() in ("1", "true", "yes")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["*"] if _allow_all else (
+        ["http://localhost:3000", "http://127.0.0.1:3000", *_extra_origins]
+    ),
     allow_methods=["*"], allow_headers=["*"],
 )
 

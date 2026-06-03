@@ -1,4 +1,4 @@
-# Q3 — Improvement Roadmap
+Q3 — Improvement Roadmap
 
 Five weeks, ten thousand dollars, two tools. I'd put three of the five weeks into Jatayu and two into Outreach. The Jatayu side is more than half the grade once Q1b is folded in, and its single biggest weakness — there's no measurement loop, so every claim about filter precision is a guess — caps the impact of every other improvement on this page. Fix that first and everything else gets sharper.
 
